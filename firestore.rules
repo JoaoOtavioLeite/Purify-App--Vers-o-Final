@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regras para coleção de usuários
+    match /users/{userId} {
+      // Permitir leitura e escrita apenas para o próprio usuário
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Ou para usuários anônimos baseado no userId local
+      allow read, write: if userId.matches('user_.*');
+    }
+    
+    // Regras para progresso dos usuários
+    match /progress/{progressId} {
+      // Permitir leitura e escrita se o userId corresponder
+      allow read, write: if resource.data.userId == request.auth.uid
+        || resource.data.userId.matches('user_.*');
+      
+      // Permitir criação se o userId for válido
+      allow create: if request.resource.data.userId == request.auth.uid
+        || request.resource.data.userId.matches('user_.*');
+    }
+    
+    // Regras para dados públicos (conteúdo motivacional, etc.)
+    match /content/{document=**} {
+      allow read: if true;
+      allow write: if false; // Apenas admins podem escrever
+    }
+    
+    // Regras para estatísticas globais (opcional)
+    match /stats/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+} 

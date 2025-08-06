@@ -1,131 +1,100 @@
-# 🚀 Purify App
+# Purify - App de Purificação de Vícios 📱
 
-Aplicativo para acompanhar sua jornada de purificação e recuperação de vícios.
+Um Progressive Web App (PWA) para acompanhar sua jornada de purificação e recuperação de vícios.
 
-## 📱 Funcionalidades
+## 🌟 Funcionalidades PWA
 
-- ✅ **Onboarding completo** - Configuração inicial personalizada
-- ✅ **Acompanhamento de progresso** - Tempo de abstinência em tempo real
-- ✅ **Sistema de conquistas** - Milestones e metas
-- ✅ **Motivação diária** - Citações e frases motivacionais
-- ✅ **Persistência de dados** - localStorage robusto
-- ✅ **Interface responsiva** - Funciona em mobile e desktop
-- ✅ **PWA ready** - Pode ser instalado como app
+- ✅ **Instalável**: Pode ser instalado como app nativo no celular
+- ✅ **Funciona Offline**: Cache inteligente para acesso sem internet
+- ✅ **Notificações Push**: Lembretes e motivação diária
+- ✅ **Responsivo**: Interface otimizada para mobile
+- ✅ **Rápido**: Carregamento otimizado com Service Worker
+- ✅ **Seguro**: HTTPS obrigatório e headers de segurança
+
+## 🚀 Deploy no Vercel
+
+### 1. Preparação
+```bash
+pnpm install
+pnpm build
+```
+
+### 2. Deploy
+1. Conecte seu repositório ao Vercel
+2. Configure as variáveis de ambiente (se necessário)
+3. O deploy será automático com as configurações PWA
+
+### 3. Verificar PWA
+Após o deploy, teste:
+- Chrome DevTools > Lighthouse > PWA Score
+- Teste de instalação em dispositivos móveis
+- Funcionalidade offline
 
 ## 🛠️ Tecnologias
 
-- **Next.js 15** - Framework React
-- **TypeScript** - Tipagem estática
-- **Tailwind CSS** - Estilização
-- **Lucide React** - Ícones
-- **localStorage** - Persistência de dados
+- **Framework**: Next.js 15
+- **PWA**: next-pwa
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui
+- **Icons**: Lucide React
 
-## 🚀 Como Deployar
+## 📱 Como Instalar o App
 
-### **Opção 1: Vercel (Mais Fácil)**
+### No Android:
+1. Abra o site no Chrome
+2. Toque em "Adicionar à tela inicial"
+3. Confirme a instalação
 
-1. **Fork este repositório** no GitHub
-2. **Acesse [vercel.com](https://vercel.com)**
-3. **Conecte sua conta GitHub**
-4. **Importe o projeto**
-5. **Clique em "Deploy"**
+### No iOS:
+1. Abra o site no Safari
+2. Toque no ícone de compartilhar
+3. Selecione "Adicionar à Tela de Início"
 
-✅ **Vantagens:** Deploy automático, SSL gratuito, CDN global
-
-### **Opção 2: Netlify**
-
-1. **Fork este repositório**
-2. **Acesse [netlify.com](https://netlify.com)**
-3. **Conecte sua conta GitHub**
-4. **Selecione o repositório**
-5. **Configure:**
-   - Build command: `npm run build`
-   - Publish directory: `.next`
-
-### **Opção 3: Railway**
-
-1. **Acesse [railway.app](https://railway.app)**
-2. **Conecte sua conta GitHub**
-3. **Selecione o repositório**
-4. **Railway detectará automaticamente o Next.js**
-
-### **Opção 4: Deploy Manual (VPS)**
+## 🔧 Comandos
 
 ```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/purify-app.git
-cd purify-app
+# Desenvolvimento
+pnpm dev
 
-# Instale dependências
-npm install
+# Build
+pnpm build
 
-# Build para produção
-npm run build
+# Produção
+pnpm start
 
-# Inicie o servidor
-npm start
+# Lint
+pnpm lint
 ```
 
-### **Opção 5: Docker**
+## 📁 Estrutura PWA
 
-```bash
-# Build da imagem
-docker build -t purify-app .
-
-# Execute o container
-docker run -p 3000:3000 purify-app
+```
+public/
+├── sw.js                    # Service Worker principal
+├── workbox-*.js            # Cache strategies
+├── manifest.webmanifest    # App manifest
+├── robots.txt              # SEO
+├── _headers                # Cache headers
+└── icons/                  # App icons
 ```
 
-## 📋 Pré-requisitos
+## 🎯 Funcionalidades do App
 
-- **Node.js 18+**
-- **npm ou pnpm**
+- Dashboard de progresso
+- Controle de objetivos
+- Estatísticas detalhadas
+- Conteúdo motivacional
+- Sistema de recompensas
+- Acompanhamento de recaídas
 
-## 🔧 Configuração Local
+## 🔒 Segurança e Performance
 
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/purify-app.git
-cd purify-app
-
-# Instale dependências
-npm install
-
-# Execute em desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-
-# Inicie em produção
-npm start
-```
-
-## 📱 Como Usar
-
-1. **Acesse o app** no navegador
-2. **Complete o onboarding** - Escolha seu vício e data da última recaída
-3. **Acompanhe seu progresso** - Tempo de abstinência em tempo real
-4. **Explore as funcionalidades** - Motivação, estatísticas, configurações
-
-## 🔒 Privacidade
-
-- ✅ **Dados locais** - Tudo salvo no localStorage do navegador
-- ✅ **Sem servidor** - Não há coleta de dados
-- ✅ **100% privado** - Seus dados ficam apenas no seu dispositivo
-
-## 📄 Licença
-
-MIT License - Veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 🤝 Contribuição
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
-
-## 📞 Suporte
-
-Se tiver dúvidas ou problemas, abra uma issue no GitHub.
+- Headers de segurança configurados
+- Cache otimizado para assets
+- Compressão automática
+- Service Worker com estratégias inteligentes
+- Manifesto PWA completo
 
 ---
 
-**Desenvolvido com ❤️ para ajudar na jornada de purificação**
+**Desenvolvido com ❤️ para ajudar na sua jornada de superação**

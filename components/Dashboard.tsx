@@ -167,24 +167,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* <h1 className="text-3xl font-bold mb-4 mt-2 bg-gradient-to-r from-blue-500 to-sky-500 text-transparent bg-clip-text drop-shadow-lg">Sua Purificação</h1> */}
-
-      {showQuote && (
-        <div className="bg-gradient-to-r from-blue-400 to-sky-500 rounded-2xl p-5 mb-4 relative shadow-lg w-full">
-
-          <div className="flex items-start gap-3">
-            <div className="bg-white/30 rounded-full p-2 flex-shrink-0">
-              <Lightbulb className="text-white" size={22} />
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-1 text-base">Motivação do dia</h3>
-              <p className="text-white/90 mb-2 leading-relaxed text-sm">{motivation.text}</p>
-              <p className="text-white/70 text-xs">{motivation.author}</p>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="flex flex-col gap-6 p-6">{/* Removendo o card de motivação do dashboard, pois já temos na página principal */}
 
       {/* Main Timer Display */}
       <div className="bg-white/70 backdrop-blur-md rounded-2xl p-5 mb-4 border border-white/40 shadow-md">
