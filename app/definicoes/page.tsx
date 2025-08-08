@@ -28,6 +28,7 @@ import {
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
 import { getMilestones } from "@/contexts/AddictionContext"
+import PushNotifications from "@/components/PushNotifications"
 import Link from "next/link"
 
 export default function DefinicoesPage() {
@@ -242,6 +243,15 @@ export default function DefinicoesPage() {
             </div>
           </div>
         ))}
+
+        {/* Notificações PWA */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <Bell className="text-blue-500" size={20} />
+            Notificações & PWA
+          </h2>
+          <PushNotifications />
+        </div>
 
         {/* App Settings */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-100">

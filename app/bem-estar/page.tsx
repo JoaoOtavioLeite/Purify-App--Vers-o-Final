@@ -786,8 +786,8 @@ export default function BemEstarPage() {
 
       {/* Modal do Relatório Premium */}
       {showReport && dailyReport && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-sm w-full max-h-[85vh] overflow-y-auto border border-white/50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-sm w-full max-h-[80vh] overflow-y-auto border border-white/50 my-4">
             {/* Header do Relatório */}
             <div className={`bg-gradient-to-r ${
               dailyReport.mood === "excellent" ? "from-green-400 to-emerald-500" :
@@ -921,7 +921,7 @@ export default function BemEstarPage() {
               </div>
 
               {/* Botão */}
-              <div className="pt-2">
+              <div className="pt-2 pb-20">
                 <button
                   onClick={() => {
                     setShowReport(false)
@@ -937,7 +937,7 @@ export default function BemEstarPage() {
         </div>
       )}
 
-      <BottomNavigation />
+      {!showReport && <BottomNavigation />}
     </div>
   )
 }

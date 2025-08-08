@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { notifications } from "@/lib/notifications"
 
 export interface AddictionType {
   id: string
@@ -164,6 +165,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
   })
 
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [lastNotifiedDay, setLastNotifiedDay] = useState(0)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -171,6 +173,26 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
+  // Verificar marcos e enviar notificações
+  useEffect(() => {
+    if (data.streakStart) {
+      const timeAbstinent = getTimeAbstinent()
+      const currentDays = timeAbstinent.days
+      
+      // Verificar se é um marco importante e se ainda não foi notificado
+      const milestones = [1, 3, 7, 15, 30, 60, 90, 180, 365]
+      
+      if (milestones.includes(currentDays) && currentDays > lastNotifiedDay) {
+        try {
+          notifications.sendMilestoneNotification(currentDays)
+          setLastNotifiedDay(currentDays)
+        } catch (error) {
+          console.log('Notificações não disponíveis:', error)
+        }
+      }
+    }
+  }, [currentTime, data.streakStart, lastNotifiedDay])
 
   // Carregar dados salvos na inicialização
   useEffect(() => {
