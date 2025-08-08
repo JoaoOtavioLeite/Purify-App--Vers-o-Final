@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import { notifications } from "@/lib/notifications"
+import { getNotifications } from "@/lib/notifications"
 
 export interface AddictionType {
   id: string
@@ -185,7 +185,8 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
       
       if (milestones.includes(currentDays) && currentDays > lastNotifiedDay) {
         try {
-          notifications.sendMilestoneNotification(currentDays)
+          const notifications = getNotifications()
+          notifications.sendMilestoneNotification?.(currentDays)
           setLastNotifiedDay(currentDays)
         } catch (error) {
           console.log('Notificações não disponíveis:', error)

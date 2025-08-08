@@ -20,10 +20,18 @@ export class PWANotifications {
   }
 
   private checkSupport() {
+    if (typeof window === 'undefined') {
+      this.isSupported = false
+      return
+    }
     this.isSupported = 'Notification' in window && 'serviceWorker' in navigator
   }
 
   private getPermission() {
+    if (typeof window === 'undefined') {
+      this.permission = 'default'
+      return
+    }
     if (this.isSupported) {
       this.permission = Notification.permission
     }
@@ -31,8 +39,8 @@ export class PWANotifications {
 
   // Solicitar permissão para notificações
   async requestPermission(): Promise<boolean> {
-    if (!this.isSupported) {
-      console.warn('Notificações não são suportadas neste navegador')
+    if (typeof window === 'undefined' || !this.isSupported) {
+      console.warn('Notificações não são suportadas neste ambiente')
       return false
     }
 
@@ -55,6 +63,7 @@ export class PWANotifications {
 
   // Configurar Service Worker para notificações em background
   private async setupServiceWorker() {
+    if (typeof window === 'undefined') return
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js')
@@ -85,6 +94,7 @@ export class PWANotifications {
 
   // Enviar notificação local
   sendNotification(title: string, body: string, icon: string = '/192.png') {
+    if (typeof window === 'undefined') return
     if (this.permission !== 'granted') {
       console.warn('Permissão para notificações não concedida')
       return
@@ -227,19 +237,43 @@ export class PWANotifications {
   }
 }
 
-// Instância global
-export const notifications = PWANotifications.getInstance()
+// Instância global - lazy initialization
+let _notificationsInstance: PWANotifications | null = null
+
+export const getNotifications = () => {
+  if (typeof window === 'undefined') {
+    // Return mock for SSR
+    return {
+      requestPermission: async () => false,
+      isEnabled: () => false,
+      sendMilestoneNotification: () => {},
+      sendCheckinReminder: () => {},
+      sendEmergencySupport: () => {},
+      disable: () => {},
+      isDisabledByUser: () => false
+    }
+  }
+  
+  if (!_notificationsInstance) {
+    _notificationsInstance = PWANotifications.getInstance()
+  }
+  return _notificationsInstance
+}
+
+export const notifications = getNotifications()
 
 // Hook para React
 export function useNotifications() {
+  const notificationsInstance = getNotifications()
+  
   return {
-    notifications,
-    requestPermission: () => notifications.requestPermission(),
-    isEnabled: () => notifications.isEnabled(),
-    sendMilestone: (days: number) => notifications.sendMilestoneNotification(days),
-    sendCheckinReminder: () => notifications.sendCheckinReminder(),
-    sendEmergencySupport: () => notifications.sendEmergencySupport(),
-    disable: () => notifications.disable(),
-    isDisabledByUser: () => notifications.isDisabledByUser()
+    notifications: notificationsInstance,
+    requestPermission: () => notificationsInstance.requestPermission?.() || Promise.resolve(false),
+    isEnabled: () => notificationsInstance.isEnabled?.() || false,
+    sendMilestone: (days: number) => notificationsInstance.sendMilestoneNotification?.(days),
+    sendCheckinReminder: () => notificationsInstance.sendCheckinReminder?.(),
+    sendEmergencySupport: () => notificationsInstance.sendEmergencySupport?.(),
+    disable: () => notificationsInstance.disable?.(),
+    isDisabledByUser: () => notificationsInstance.isDisabledByUser?.() || false
   }
 }
