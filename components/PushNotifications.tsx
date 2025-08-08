@@ -3,56 +3,42 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Bell, BellOff } from 'lucide-react'
-import { requestNotificationPermission, onMessageListener } from '@/lib/firebase'
-import { toast } from 'sonner'
 
 export default function PushNotifications() {
   const [isEnabled, setIsEnabled] = useState(false)
-  const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
-    // Verificar se já tem permissão
+    // Verificar se já tem permissão para notificações nativas
     if ('Notification' in window) {
       setIsEnabled(Notification.permission === 'granted')
     }
-
-    // Escutar mensagens em foreground
-    const setupMessageListener = async () => {
-      try {
-        await onMessageListener((payload) => {
-          console.log('Mensagem recebida em foreground:', payload)
-          toast.success(payload.notification?.title || 'Nova notificação!', {
-            description: payload.notification?.body
-          })
-        })
-      } catch (error) {
-        console.error('Erro ao configurar listener:', error)
-      }
-    }
-
-    setupMessageListener()
   }, [])
 
   const handleToggleNotifications = async () => {
     if (isEnabled) {
-      // Desabilitar (apenas visualmente, não há como revogar permissão)
+      // Desabilitar notificações
       setIsEnabled(false)
-      setToken(null)
-      toast.info('Notificações desabilitadas')
+      localStorage.setItem('notifications_enabled', 'false')
+      alert('Notificações desabilitadas')
     } else {
-      // Solicitar permissão
-      const fcmToken = await requestNotificationPermission()
-      if (fcmToken) {
-        setToken(fcmToken)
-        setIsEnabled(true)
-        toast.success('Notificações habilitadas!', {
-          description: 'Você receberá lembretes motivacionais'
-        })
-        
-        // Aqui você pode salvar o token no Firestore
-        // saveTokenToFirestore(fcmToken)
+      // Solicitar permissão para notificações nativas
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission()
+        if (permission === 'granted') {
+          setIsEnabled(true)
+          localStorage.setItem('notifications_enabled', 'true')
+          alert('Notificações habilitadas! Você receberá lembretes motivacionais.')
+          
+          // Teste de notificação
+          new Notification('Purify App', {
+            body: 'Notificações ativadas com sucesso!',
+            icon: '/icon-192.png'
+          })
+        } else {
+          alert('Permissão negada para notificações')
+        }
       } else {
-        toast.error('Permissão negada para notificações')
+        alert('Seu navegador não suporta notificações')
       }
     }
   }
