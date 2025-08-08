@@ -3,6 +3,7 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
   "framework": "nextjs",
+  "public": true,
   "headers": [
     {
       "source": "/sw.js",
