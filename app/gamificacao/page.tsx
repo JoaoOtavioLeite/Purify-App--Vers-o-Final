@@ -238,64 +238,73 @@ export default function GamificacaoPage() {
   const lockedAchievements = achievements.filter(a => !a.unlocked)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header com Nível e Pontos */}
-      <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-6 rounded-b-3xl shadow-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Gamificação</h1>
-            <p className="text-purple-100">Seu progresso em conquistas</p>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-white">{userPoints.toLocaleString()}</div>
-            <div className="text-purple-200 text-sm">pontos XP</div>
-          </div>
-        </div>
-
-        {/* Nível Atual */}
-        <div className="bg-white/20 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-full ${currentLevelData.color} flex items-center justify-center`}>
-                {currentLevelData.icon}
-              </div>
-              <div>
-                <div className="text-white font-bold text-lg">Nível {userLevel}</div>
-                <div className="text-purple-200">{currentLevelData.title}</div>
-              </div>
+      <div className="bg-gradient-to-r from-purple-500 to-indigo-600 pt-14 pb-6 px-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-xl font-medium text-white">Gamificação</h1>
+              <p className="text-white/80 text-sm">Seu progresso em conquistas</p>
             </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 text-center">
+              <div className="text-xl font-bold text-white">{userPoints.toLocaleString()}</div>
+              <div className="text-white/90 text-xs font-medium">pontos XP</div>
+            </div>
+          </div>
+
+          {/* Nível Atual */}
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl ${currentLevelData.color} flex items-center justify-center`}>
+                  {currentLevelData.icon}
+                </div>
+                <div>
+                  <div className="text-white font-semibold text-base">Nível {userLevel}</div>
+                  <div className="text-white/80 text-sm">{currentLevelData.title}</div>
+                </div>
+              </div>
+              {nextLevelData && (
+                <div className="text-right">
+                  <div className="text-white text-xs">Próximo nível</div>
+                  <div className="text-white/80 text-xs">{nextLevelData.pointsRequired - userPoints} XP</div>
+                </div>
+              )}
+            </div>
+            
             {nextLevelData && (
-              <div className="text-right">
-                <div className="text-white text-sm">Próximo nível</div>
-                <div className="text-purple-200 text-xs">{nextLevelData.pointsRequired - userPoints} XP</div>
+              <div>
+                <div className="bg-white/20 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-white h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${userExperience}%` }}
+                  />
+                </div>
+                <div className="text-center text-white/80 text-xs mt-1">
+                  {userExperience.toFixed(1)}% para Nível {userLevel + 1}
+                </div>
               </div>
             )}
           </div>
-          
-          {nextLevelData && (
-            <div className="mb-2">
-              <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                <div 
-                  className="bg-white h-full transition-all duration-500 rounded-full"
-                  style={{ width: `${userExperience}%` }}
-                />
-              </div>
-              <div className="text-center text-purple-100 text-xs mt-1">
-                {userExperience.toFixed(1)}% para Nível {userLevel + 1}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="px-4 -mt-2 relative z-20 space-y-4">
         {/* Conquistas Desbloqueadas */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-green-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Trophy className="text-green-600" size={24} />
-            Conquistas Desbloqueadas ({unlockedAchievements.length})
-          </h2>
-          
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+              <Trophy className="text-white" size={20} />
+            </div>
+            <div>
+              <h2 className="text-gray-900 font-semibold text-base">Conquistas Desbloqueadas</h2>
+              <p className="text-gray-600 text-sm">{unlockedAchievements.length} de {achievements.length} desbloqueadas</p>
+            </div>
+          </div>
           {unlockedAchievements.length === 0 ? (
             <div className="text-center py-8">
               <Award className="text-gray-400 mx-auto mb-3" size={48} />
@@ -329,11 +338,16 @@ export default function GamificacaoPage() {
         </div>
 
         {/* Conquistas Bloqueadas */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Target className="text-gray-600" size={24} />
-            Próximas Conquistas ({lockedAchievements.length})
-          </h2>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gray-500 rounded-xl flex items-center justify-center">
+              <Target className="text-white" size={20} />
+            </div>
+            <div>
+              <h2 className="text-gray-900 font-semibold text-base">Próximas Conquistas</h2>
+              <p className="text-gray-600 text-sm">{lockedAchievements.length} disponíveis para desbloquear</p>
+            </div>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {lockedAchievements.map((achievement) => (
@@ -430,24 +444,29 @@ export default function GamificacaoPage() {
         </div>
 
         {/* Estatísticas de Gamificação */}
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-6 text-center shadow-lg">
-          <h3 className="text-white font-bold text-lg mb-4">🎮 Suas Estatísticas</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/20 rounded-lg p-3">
-              <div className="text-2xl font-bold text-white">{userLevel}</div>
-              <div className="text-orange-100 text-sm">Nível Atual</div>
+        <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl p-5 text-center">
+          <div className="flex justify-center mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <TrendingUp className="text-white" size={20} />
             </div>
-            <div className="bg-white/20 rounded-lg p-3">
-              <div className="text-2xl font-bold text-white">{unlockedAchievements.length}</div>
-              <div className="text-orange-100 text-sm">Conquistas</div>
+          </div>
+          <h3 className="text-white font-semibold text-base mb-4">🎮 Suas Estatísticas</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white/15 rounded-xl p-3">
+              <div className="text-xl font-bold text-white">{userLevel}</div>
+              <div className="text-white/80 text-xs font-medium">Nível Atual</div>
             </div>
-            <div className="bg-white/20 rounded-lg p-3">
-              <div className="text-2xl font-bold text-white">{userPoints.toLocaleString()}</div>
-              <div className="text-orange-100 text-sm">Total XP</div>
+            <div className="bg-white/15 rounded-xl p-3">
+              <div className="text-xl font-bold text-white">{unlockedAchievements.length}</div>
+              <div className="text-white/80 text-xs font-medium">Conquistas</div>
             </div>
-            <div className="bg-white/20 rounded-lg p-3">
-              <div className="text-2xl font-bold text-white">{timeAbstinent.days}</div>
-              <div className="text-orange-100 text-sm">Dias Limpos</div>
+            <div className="bg-white/15 rounded-xl p-3">
+              <div className="text-xl font-bold text-white">{userPoints.toLocaleString()}</div>
+              <div className="text-white/80 text-xs font-medium">Total XP</div>
+            </div>
+            <div className="bg-white/15 rounded-xl p-3">
+              <div className="text-xl font-bold text-white">{timeAbstinent.days}</div>
+              <div className="text-white/80 text-xs font-medium">Dias Limpos</div>
             </div>
           </div>
         </div>

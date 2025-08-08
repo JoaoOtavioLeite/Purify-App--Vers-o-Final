@@ -237,37 +237,44 @@ export default function EmergenciaPage() {
   if (!data.addictionType) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 pb-20">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header de Emergência */}
-      <div className="bg-gradient-to-r from-red-500 to-pink-500 p-6 rounded-b-3xl shadow-lg">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <Shield className="text-white" size={28} />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Momento Difícil?</h1>
-            <p className="text-white/90">Você não está sozinho. Vamos passar por isso juntos.</p>
-          </div>
-        </div>
+      <div className="bg-gradient-to-r from-red-500 to-pink-600 pt-14 pb-6 px-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
         
-        <div className="bg-white/20 rounded-xl p-4 mt-4">
-          <p className="text-white font-medium mb-2">💪 Lembre-se:</p>
-          <p className="text-white/90 text-sm leading-relaxed">
-            Este sentimento é temporário. Você já passou por isso antes e pode passar de novo. 
-            Sua força é maior que qualquer impulso.
-          </p>
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <Shield className="text-white" size={24} />
+            </div>
+            <div>
+              <h1 className="text-xl font-medium text-white">Momento Difícil?</h1>
+              <p className="text-white/80 text-sm">Você não está sozinho. Vamos passar por isso juntos.</p>
+            </div>
+          </div>
+          
+          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-white font-semibold text-sm">💪 Lembre-se:</span>
+            </div>
+            <p className="text-white/90 text-xs leading-relaxed">
+              Este sentimento é temporário. Você já passou por isso antes e pode passar de novo. 
+              Sua força é maior que qualquer impulso.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="px-4 -mt-2 relative z-20 space-y-4">
         {/* Exercício de Respiração */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-blue-100">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <Wind className="text-blue-600" size={20} />
+            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+              <Wind className="text-white" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-800">Respiração 4-7-8</h2>
+              <h2 className="text-gray-900 font-semibold text-base">Respiração 4-7-8</h2>
               <p className="text-gray-600 text-sm">Técnica para acalmar a mente</p>
             </div>
           </div>
@@ -315,12 +322,16 @@ export default function EmergenciaPage() {
         </div>
 
         {/* Atividades Rápidas */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-green-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Activity className="text-green-600" size={24} />
-            Atividades de Distração
-          </h2>
-          <p className="text-gray-600 mb-4 text-sm">Escolha uma atividade para desviar o foco:</p>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+              <Activity className="text-white" size={20} />
+            </div>
+            <div>
+              <h2 className="text-gray-900 font-semibold text-base">Atividades de Distração</h2>
+              <p className="text-gray-600 text-sm">Escolha uma atividade para desviar o foco:</p>
+            </div>
+          </div>
           
           <div className="grid grid-cols-2 gap-3">
             {quickActivities.map((activity) => (
@@ -349,13 +360,17 @@ export default function EmergenciaPage() {
 
         {/* Check-in Emocional Cristão */}
         {!selectedEmotion ? (
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-purple-100">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Cross className="text-purple-600" size={24} />
-              Como Seu Coração Está Hoje?
-            </h2>
-            
-            <p className="text-gray-600 mb-4 text-sm">Compartilhe seus sentimentos com Deus e receba Sua Palavra de conforto:</p>
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+                <Heart className="text-white" size={20} />
+              </div>
+              <div>
+                <h2 className="text-gray-900 font-semibold text-base">Como Seu Coração Está Hoje?</h2>
+                <p className="text-gray-600 text-sm">Compartilhe seus sentimentos com Deus e receba Sua Palavra de conforto:</p>
+              </div>
+            </div>
+
             
             <div className="grid grid-cols-2 gap-3">
               <button 
@@ -482,9 +497,14 @@ export default function EmergenciaPage() {
         )}
 
         {/* Mensagem Motivacional */}
-        <div className="bg-gradient-to-r from-purple-400 to-pink-400 rounded-2xl p-6 text-center shadow-lg">
-          <h3 className="text-white font-bold text-lg mb-2">🌟 Você É Mais Forte!</h3>
-          <p className="text-white/90 mb-4 leading-relaxed">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl p-5 text-center">
+          <div className="flex justify-center mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <Zap className="text-white" size={20} />
+            </div>
+          </div>
+          <h3 className="text-white font-semibold text-base mb-2">🌟 Você É Mais Forte!</h3>
+          <p className="text-white/90 text-sm leading-relaxed mb-3">
             Cada momento que você resiste é uma vitória. Seu tempo limpo de{" "}
             {data.streakStart && (
               <>
@@ -492,8 +512,8 @@ export default function EmergenciaPage() {
               </>
             )} é a prova de que você consegue.
           </p>
-          <div className="bg-white/20 rounded-lg p-3">
-            <p className="text-white text-sm">
+          <div className="bg-white/15 rounded-xl p-3">
+            <p className="text-white text-xs font-medium">
               💡 <strong>Dica:</strong> Este sentimento vai passar. Foque no próximo minuto, não no dia todo.
             </p>
           </div>

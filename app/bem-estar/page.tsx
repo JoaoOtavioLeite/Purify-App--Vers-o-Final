@@ -189,15 +189,15 @@ export default function BemEstarPage() {
       emoji: "💝"
     },
     {
-      id: "gratitude_moments",
-      question: "Teve momentos de gratidão?",
-      description: "Reconheceu coisas boas da vida",
+      id: "physical_activity",
+      question: "Praticou alguma atividade física?",
+      description: "Exercícios, caminhada ou movimento corporal",
       type: "boolean",
-      category: "spiritual",
+      category: "physical",
       weight: 0.10,
-      icon: <Sparkles className="text-amber-500" size={24} />,
-      color: "from-amber-400 to-yellow-500",
-      emoji: "✨"
+      icon: <Activity className="text-green-500" size={24} />,
+      color: "from-green-400 to-emerald-500",
+      emoji: "🏃‍♂️"
     }
   ]
 
@@ -292,9 +292,6 @@ export default function BemEstarPage() {
     setDailyReport(report)
     setShowReport(true)
     
-    // Salvar que o check-in foi concluído hoje
-    saveCheckinCompletion()
-    
     if (mood === "excellent" || mood === "good") {
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 3000)
@@ -308,8 +305,8 @@ export default function BemEstarPage() {
 
     // Conquistas
     if (categoryScores.physical >= 4) achievements.push("🏃‍♂️ Campeão do Autocuidado")
-    if (categoryScores.mental >= 4) achievements.push("🧠 Mestre da Resistência")
-    if (categoryScores.spiritual >= 4) achievements.push("✨ Guru da Gratidão")
+    if (categoryScores.mental >= 4) achievements.push("🧠 Mestre da Mente Zen")
+    if (categoryScores.spiritual >= 4) achievements.push("✨ Alma Equilibrada")
     if (categoryScores.social >= 4) achievements.push("👥 Conectador Social")
 
     const avoidedTriggers = answers.find(a => a.questionId === "avoided_triggers")
@@ -328,10 +325,10 @@ export default function BemEstarPage() {
     }
 
     // Próximas metas
-    if (categoryScores.physical < 4) nextGoals.push("💧 Beber mais água e movimentar o corpo")
-    if (categoryScores.mental < 4) nextGoals.push("🧘‍♂️ Praticar 5 minutos de respiração consciente")
+    if (categoryScores.physical < 4) nextGoals.push("🏃‍♂️ Fazer pelo menos 15 minutos de atividade física")
+    if (categoryScores.mental < 4) nextGoals.push("📚 Ler por 15 minutos ou aprender algo novo")
     if (categoryScores.social < 4) nextGoals.push("📱 Ligar para alguém especial")
-    if (categoryScores.spiritual < 4) nextGoals.push("🙏 Listar 3 coisas pelas quais sou grato")
+    if (categoryScores.spiritual < 4) nextGoals.push("🙏 Dedicar um momento para reflexão ou gratidão")
 
     return { recommendations, achievements, nextGoals }
   }
@@ -348,13 +345,6 @@ export default function BemEstarPage() {
 
     // Marcar pergunta como completada
     setCompletedQuestions(prev => new Set([...prev, currentQuestion]))
-    
-    // Auto-avançar para próxima pergunta
-    setTimeout(() => {
-      if (currentQuestion < dailyQuestions.length - 1) {
-        setCurrentQuestion(prev => prev + 1)
-      }
-    }, 500)
   }
 
   const getDailyAnswer = (questionId: string): boolean | number | string | undefined => {
@@ -456,37 +446,11 @@ export default function BemEstarPage() {
                   Cada check-in é um passo importante na sua jornada de crescimento pessoal.
                 </p>
                 
-                <div className="flex gap-2 justify-center">
-                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-xl text-sm font-medium">
-                    ⭐ Progresso Salvo
-                  </div>
-                  <div className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-medium">
-                    📊 Dados Registrados
-                  </div>
-                </div>
+
               </div>
             </div>
 
-            {/* Botões de Ação */}
-            <div className="mt-6 w-full max-w-md space-y-3">
-              <button
-                onClick={() => {
-                  // Aqui você pode implementar lógica para mostrar o relatório do dia
-                  alert("Funcionalidade de visualizar relatório será implementada em breve!")
-                }}
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-2xl font-bold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg active:scale-95"
-              >
-                📋 Ver Relatório de Hoje
-              </button>
-              
-              {/* Botão de Reset (apenas para desenvolvimento) */}
-              <button
-                onClick={resetCheckin}
-                className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-xl text-sm font-medium hover:from-red-500 hover:to-pink-600 transition-all shadow-md active:scale-95"
-              >
-                🔄 Resetar Check-in (Desenvolvimento)
-              </button>
-            </div>
+
           </div>
         </div>
 
@@ -612,9 +576,9 @@ export default function BemEstarPage() {
             {currentQuestion < dailyQuestions.length - 1 ? (
               <button
                 onClick={() => setCurrentQuestion(prev => prev + 1)}
-                disabled={!getDailyAnswer(currentQ?.id)}
+                disabled={getDailyAnswer(currentQ?.id) === undefined}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  !getDailyAnswer(currentQ?.id)
+                  getDailyAnswer(currentQ?.id) === undefined
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                     : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 active:scale-95 shadow-md"
                 }`}
@@ -640,6 +604,25 @@ export default function BemEstarPage() {
             )}
           </div>
         </div>
+
+        {/* Instruções da Pergunta */}
+        {currentQ?.type === "scale" && (
+          <div className="bg-white border-t border-b border-gray-200 px-4 py-4">
+            <div className="text-center max-w-md mx-auto">
+              <div className="text-gray-800 text-lg font-semibold mb-1">Avalie de 1 a 5</div>
+              <div className="text-sm text-gray-600">1 = Muito baixo | 5 = Muito alto</div>
+            </div>
+          </div>
+        )}
+
+        {currentQ?.type === "emoji" && (
+          <div className="bg-white border-t border-b border-gray-200 px-4 py-4">
+            <div className="text-center max-w-md mx-auto">
+              <div className="text-gray-800 text-lg font-semibold mb-1">Como você está se sentindo?</div>
+              <div className="text-sm text-gray-600">Escolha o emoji que melhor te representa</div>
+            </div>
+          </div>
+        )}
 
         {/* Área de Resposta */}
         <div className="flex-1 bg-gray-50 px-4 py-4 min-h-0">
@@ -714,12 +697,8 @@ export default function BemEstarPage() {
           )}
 
           {currentQ?.type === "scale" && (
-            <div className="max-w-md mx-auto space-y-6">
-              <div className="text-center">
-                <div className="text-gray-700 text-lg font-medium mb-2">Avalie de 1 a 5</div>
-                <div className="text-sm text-gray-500">1 = Muito baixo | 5 = Muito alto</div>
-              </div>
-              <div className="grid grid-cols-5 gap-3">
+            <div className="max-w-md mx-auto h-full flex items-center">
+              <div className="grid grid-cols-5 gap-3 w-full">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <button
                     key={level}
@@ -766,10 +745,6 @@ export default function BemEstarPage() {
 
           {currentQ?.type === "emoji" && (
             <div className="w-full h-full flex flex-col justify-center">
-              <div className="text-center mb-4">
-                <div className="text-gray-700 text-lg font-medium mb-1">Como você está se sentindo?</div>
-                <div className="text-sm text-gray-500">Escolha o emoji que melhor te representa</div>
-              </div>
               <div className="grid grid-cols-3 gap-4 max-w-xs mx-auto">
                 {emojiOptions.map((option) => (
                   <button
@@ -826,7 +801,10 @@ export default function BemEstarPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-2xl font-bold">Seu Relatório Mágico ✨</h3>
                   <button
-                    onClick={() => setShowReport(false)}
+                    onClick={() => {
+                      setShowReport(false)
+                      saveCheckinCompletion()
+                    }}
                     className="bg-white/20 hover:bg-white/30 p-2 rounded-xl transition-colors backdrop-blur-sm"
                   >
                     ✕
@@ -873,30 +851,39 @@ export default function BemEstarPage() {
 
               {/* Scores Visuais */}
               <div className="grid grid-cols-2 gap-4">
-                {Object.entries(dailyReport.category_scores).map(([category, score]) => (
-                  <div key={category} className="bg-gradient-to-br from-white to-gray-50 p-4 rounded-2xl border border-gray-200 text-center">
-                    <div className="mb-2">
-                      {category === "physical" && <Activity className="mx-auto text-orange-500" size={24} />}
-                      {category === "mental" && <Brain className="mx-auto text-purple-500" size={24} />}
-                      {category === "spiritual" && <Sparkles className="mx-auto text-yellow-500" size={24} />}
-                      {category === "social" && <Users className="mx-auto text-blue-500" size={24} />}
+                {Object.entries(dailyReport.category_scores).map(([category, score]) => {
+                  const categoryNames = {
+                    physical: "Físico",
+                    mental: "Mental", 
+                    spiritual: "Espiritual",
+                    social: "Social"
+                  }
+                  
+                  return (
+                    <div key={category} className="bg-gradient-to-br from-white to-gray-50 p-4 rounded-2xl border border-gray-200 text-center">
+                      <div className="mb-2">
+                        {category === "physical" && <Activity className="mx-auto text-orange-500" size={24} />}
+                        {category === "mental" && <Brain className="mx-auto text-purple-500" size={24} />}
+                        {category === "spiritual" && <Sparkles className="mx-auto text-yellow-500" size={24} />}
+                        {category === "social" && <Users className="mx-auto text-blue-500" size={24} />}
+                      </div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">{categoryNames[category as keyof typeof categoryNames]}</div>
+                      <div className="text-2xl font-bold text-gray-800">
+                        {score.toFixed(1)}
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            category === "physical" ? "bg-orange-500" :
+                            category === "mental" ? "bg-purple-500" :
+                            category === "spiritual" ? "bg-yellow-500" : "bg-blue-500"
+                          }`}
+                          style={{ width: `${(score / 5) * 100}%` }}
+                        ></div>
+                      </div>
                     </div>
-                    <div className="text-xs font-medium text-gray-600 mb-1 capitalize">{category}</div>
-                    <div className="text-2xl font-bold text-gray-800">
-                      {score.toFixed(1)}
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                      <div 
-                        className={`h-2 rounded-full ${
-                          category === "physical" ? "bg-orange-500" :
-                          category === "mental" ? "bg-purple-500" :
-                          category === "spiritual" ? "bg-yellow-500" : "bg-blue-500"
-                        }`}
-                        style={{ width: `${(score / 5) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               {/* Próximas Metas */}
@@ -933,24 +920,16 @@ export default function BemEstarPage() {
                 </div>
               </div>
 
-              {/* Botões */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowReport(false)}
-                  className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all shadow-md active:scale-95"
-                >
-                  Incrível! 🚀
-                </button>
+              {/* Botão */}
+              <div className="pt-2">
                 <button
                   onClick={() => {
-                    setDailyAnswers([])
-                    setCurrentQuestion(0)
-                    setCompletedQuestions(new Set())
                     setShowReport(false)
+                    saveCheckinCompletion()
                   }}
-                  className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition-colors active:scale-95"
+                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl font-bold hover:from-indigo-600 hover:to-purple-700 transition-all shadow-md active:scale-95"
                 >
-                  Novo Check-in
+                  Incrível! 🚀
                 </button>
               </div>
             </div>

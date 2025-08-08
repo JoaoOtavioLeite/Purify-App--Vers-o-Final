@@ -17,7 +17,14 @@ import {
   Settings,
   Download,
   Share2,
-  Star
+  Star,
+  Calendar,
+  Gift,
+  Activity,
+  CheckCircle2,
+  Palette,
+  Languages,
+  HelpCircle
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
 import { getMilestones } from "@/contexts/AddictionContext"
@@ -60,6 +67,27 @@ export default function DefinicoesPage() {
       ]
     },
     {
+      title: "Planejamento e Metas",
+      items: [
+        {
+          title: "Objetivos",
+          description: "Configure suas metas de purificação",
+          icon: Target,
+          href: "/objetivos",
+          color: "text-blue-500",
+          bg: "bg-blue-50 border-blue-200"
+        },
+        {
+          title: "Incentivos",
+          description: "Recompensas por atingir objetivos",
+          icon: Gift,
+          href: "/incentivos",
+          color: "text-green-500",
+          bg: "bg-green-50 border-green-200"
+        }
+      ]
+    },
+    {
       title: "Progresso e Análises",
       items: [
         {
@@ -71,25 +99,25 @@ export default function DefinicoesPage() {
           bg: "bg-purple-50 border-purple-200"
         },
         {
-          title: "Relatórios",
-          description: "Análises detalhadas e insights",
-          icon: BarChart3,
-          href: "/relatorios",
-          color: "text-blue-500",
-          bg: "bg-blue-50 border-blue-200"
-        },
-        {
           title: "Estatísticas",
           description: "Seu progresso e marcos",
-          icon: Target,
+          icon: BarChart3,
           href: "/estatistica",
-          color: "text-green-500",
-          bg: "bg-green-50 border-green-200"
+          color: "text-cyan-500",
+          bg: "bg-cyan-50 border-cyan-200"
+        },
+        {
+          title: "Relatórios",
+          description: "Análises detalhadas e insights",
+          icon: Activity,
+          href: "/relatorios",
+          color: "text-orange-500",
+          bg: "bg-orange-50 border-orange-200"
         }
       ]
     },
     {
-      title: "Conhecimento",
+      title: "Conhecimento e Recursos",
       items: [
         {
           title: "Centro de Recursos",
@@ -103,13 +131,45 @@ export default function DefinicoesPage() {
     }
   ]
 
+
+
   const appSettings = [
+    {
+      title: "Editar Data de Recaída",
+      description: "Ajustar quando sua jornada começou",
+      icon: Calendar,
+      href: "/definicoes/editar-data",
+    },
     {
       title: "Notificações",
       description: "Lembretes e motivação diária",
       icon: Bell,
       action: () => {
-        alert("Funcionalidade em desenvolvimento")
+        alert("🔔 Configurações de Notificações\n\n• Lembrete matinal\n• Motivação diária\n• Marcos atingidos\n• Check-in noturno\n\nFuncionalidade será implementada em breve!")
+      },
+    },
+    {
+      title: "Personalização",
+      description: "Temas e aparência do app",
+      icon: Palette,
+      action: () => {
+        alert("🎨 Personalização\n\n• Modo escuro/claro\n• Cores do tema\n• Tamanho da fonte\n• Layout personalizado\n\nFuncionalidade será implementada em breve!")
+      },
+    },
+    {
+      title: "Backup e Sincronização",
+      description: "Sincronize seus dados na nuvem",
+      icon: Download,
+      action: () => {
+        alert("☁️ Backup e Sincronização\n\n• Backup automático\n• Sincronização entre dispositivos\n• Exportar dados\n• Restaurar backup\n\nFuncionalidade será implementada em breve!")
+      },
+    },
+    {
+      title: "Central de Ajuda",
+      description: "Tutoriais e perguntas frequentes",
+      icon: HelpCircle,
+      action: () => {
+        alert("❓ Central de Ajuda\n\n• Como usar o app\n• Perguntas frequentes\n• Dicas de purificação\n• Contato com suporte\n\nFuncionalidade será implementada em breve!")
       },
     },
     {
@@ -117,7 +177,7 @@ export default function DefinicoesPage() {
       description: "Purify v2.0 - App de Purificação",
       icon: Info,
       action: () => {
-        alert("Purify App v2.0.0\nApp completo de purificação de vícios\n\n✨ Novas funcionalidades:\n• Sistema de emergência\n• Gamificação\n• Bem-estar mental\n• Centro de recursos\n• Análises avançadas\n\n© 2024 Purify Team")
+        alert("Purify App v2.0.0\nApp completo de purificação de vícios\n\n✨ Novas funcionalidades:\n• Sistema de emergência\n• Gamificação\n• Bem-estar mental\n• Centro de recursos\n• Análises avançadas\n• Planejamento de metas\n• Sistema de incentivos\n\n© 2024 Purify Team")
       },
     },
   ]
@@ -187,24 +247,36 @@ export default function DefinicoesPage() {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-100">
           <h2 className="text-lg font-bold text-gray-800 mb-4">Configurações</h2>
           <div className="space-y-3">
-            {appSettings.map((setting, index) => (
-              <div
-                key={index}
-                onClick={setting.action}
-                className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <setting.icon className="text-gray-600" size={20} />
+            {appSettings.map((setting, index) => {
+              const content = (
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-gray-100 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                      <setting.icon className="text-gray-600" size={20} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{setting.title}</h3>
+                      <p className="text-gray-600 text-sm">{setting.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">{setting.title}</h3>
-                    <p className="text-gray-600 text-sm">{setting.description}</p>
-                  </div>
+                  <ChevronRight className="text-gray-400" size={20} />
                 </div>
-                <ChevronRight className="text-gray-400" size={20} />
-              </div>
-            ))}
+              )
+
+              if (setting.href) {
+                return (
+                  <Link key={index} href={setting.href}>
+                    {content}
+                  </Link>
+                )
+              }
+
+              return (
+                <div key={index} onClick={setting.action}>
+                  {content}
+                </div>
+              )
+            })}
           </div>
         </div>
 
