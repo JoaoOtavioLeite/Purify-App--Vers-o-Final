@@ -9,7 +9,7 @@ https://purify-app.vercel.app
 
 ### **URL de Backup:**
 ```
-https://purify-app-vers-o-final-iqvbozugk-joaootavioleites-projects.vercel.app
+https://purify-app-vers-o-final-p8ml0qcd6-joaootavioleites-projects.vercel.app
 ```
 
 ---
