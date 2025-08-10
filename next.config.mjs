@@ -11,9 +11,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'export',
-  trailingSlash: true,
-  distDir: 'out',
+  trailingSlash: false,
 }
 
 export default withPWA({

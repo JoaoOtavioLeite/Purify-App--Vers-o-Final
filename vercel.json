@@ -4,8 +4,6 @@
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "public": true,
-  "outputDirectory": "out",
-  "trailingSlash": false,
   "headers": [
     {
       "source": "/sw.js",
