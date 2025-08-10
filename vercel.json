@@ -6,7 +6,6 @@
   "public": true,
   "outputDirectory": "out",
   "trailingSlash": false,
-  "functions": {},
   "headers": [
     {
       "source": "/sw.js",
