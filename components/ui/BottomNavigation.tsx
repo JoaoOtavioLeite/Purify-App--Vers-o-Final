@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, Calendar, Lightbulb, TrendingUp, Settings, Shield } from "lucide-react"
+import { useHaptics } from "@/lib/haptics"
 
 const navItems = [
   {
@@ -41,6 +42,7 @@ const navItems = [
 
 export function BottomNavigation() {
   const pathname = usePathname()
+  const haptics = useHaptics()
 
   return (
     <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md z-40">
@@ -49,7 +51,18 @@ export function BottomNavigation() {
           {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
             return (
-              <Link href={item.href} key={item.href} className="flex flex-col items-center gap-2 flex-1">
+              <Link 
+                href={item.href} 
+                key={item.href} 
+                className="flex flex-col items-center gap-2 flex-1"
+                onClick={() => {
+                  if (item.href === "/emergencia") {
+                    haptics.emergency()
+                  } else {
+                    haptics.light()
+                  }
+                }}
+              >
                 <div
                   className={`rounded-2xl p-3 flex items-center justify-center transition-all duration-300 relative
                     ${isActive 

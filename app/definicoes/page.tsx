@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
 import { 
   ChevronRight, 
@@ -29,11 +30,15 @@ import {
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
 import { getMilestones } from "@/contexts/AddictionContext"
 import PushNotifications from "@/components/PushNotifications"
+import { NotificationSettings } from "@/components/NotificationSettings"
+import { useHaptics } from "@/lib/haptics"
 import Link from "next/link"
 
 export default function DefinicoesPage() {
   const { data, getTimeAbstinent } = useAddiction()
   const timeAbstinent = getTimeAbstinent()
+  const haptics = useHaptics()
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false)
 
   if (!data.addictionType) return null
 
@@ -136,18 +141,19 @@ export default function DefinicoesPage() {
 
   const appSettings = [
     {
+      title: "Notificações",
+      description: "Configure lembretes e marcos diários",
+      icon: Bell,
+      action: () => {
+        haptics.light()
+        setShowNotificationSettings(true)
+      },
+    },
+    {
       title: "Editar Data de Recaída",
       description: "Ajustar quando sua jornada começou",
       icon: Calendar,
       href: "/definicoes/editar-data",
-    },
-    {
-      title: "Notificações",
-      description: "Lembretes e motivação diária",
-      icon: Bell,
-      action: () => {
-        alert("🔔 Configurações de Notificações\n\n• Lembrete matinal\n• Motivação diária\n• Marcos atingidos\n• Check-in noturno\n\nFuncionalidade será implementada em breve!")
-      },
     },
     {
       title: "Personalização",
@@ -303,6 +309,11 @@ export default function DefinicoesPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de Configurações de Notificação */}
+      {showNotificationSettings && (
+        <NotificationSettings onClose={() => setShowNotificationSettings(false)} />
+      )}
 
       <BottomNavigation />
     </div>

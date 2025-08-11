@@ -1,0 +1,6 @@
+{
+  "public": true,
+  "auth": false,
+  "protection": false,
+  "passwordProtection": false
+}

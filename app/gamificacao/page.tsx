@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
 import { 
   Trophy, 
@@ -18,9 +18,14 @@ import {
   Shield,
   Brain,
   Flame,
-  Users
+  Users,
+  Share2,
+  CheckCircle
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
+import { useHaptics } from "@/lib/haptics"
+import { useDeviceFeatures } from "@/lib/device-features"
+import html2canvas from "html2canvas"
 
 interface Achievement {
   id: string
@@ -47,6 +52,11 @@ export default function GamificacaoPage() {
   const [userLevel, setUserLevel] = useState(1)
   const [userPoints, setUserPoints] = useState(0)
   const [userExperience, setUserExperience] = useState(0)
+  const [shareMessage, setShareMessage] = useState<string | null>(null)
+  const [isCapturing, setIsCapturing] = useState(false)
+  const achievementsCardRef = useRef<HTMLDivElement>(null)
+  const haptics = useHaptics()
+  const { share } = useDeviceFeatures()
 
   const timeAbstinent = getTimeAbstinent()
 
@@ -237,6 +247,83 @@ export default function GamificacaoPage() {
   const unlockedAchievements = achievements.filter(a => a.unlocked)
   const lockedAchievements = achievements.filter(a => !a.unlocked)
 
+  const handleShareAchievements = async () => {
+    haptics.medium()
+    setIsCapturing(true)
+    setShareMessage("📸 Capturando conquistas...")
+
+    try {
+      if (!achievementsCardRef.current) {
+        throw new Error("Elemento não encontrado")
+      }
+
+      const canvas = await html2canvas(achievementsCardRef.current, {
+        backgroundColor: '#f8fafc',
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        removeContainer: false,
+        foreignObjectRendering: false,
+        imageTimeout: 0,
+        logging: false,
+        width: achievementsCardRef.current.offsetWidth,
+        height: achievementsCardRef.current.offsetHeight,
+      })
+
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+        }, 'image/png', 1.0)
+      })
+
+      if (!blob) {
+        throw new Error("Erro ao gerar imagem")
+      }
+
+      const file = new File([blob], 'minhas-conquistas-purify.png', { type: 'image/png' })
+
+      if (typeof navigator !== 'undefined' && 'share' in navigator && 'canShare' in navigator) {
+        const shareData = {
+          title: 'Minhas Conquistas no Purify',
+          text: `🏆 Nível ${userLevel} alcançado!
+💎 ${userPoints} pontos conquistados
+🎯 ${unlockedAchievements.length} conquistas desbloqueadas
+
+🚀 Cada vitória conta na jornada!
+
+#Purify #Conquistas #Gamificação #Superação`,
+          files: [file]
+        }
+
+        if (navigator.canShare && navigator.canShare(shareData)) {
+          await navigator.share(shareData)
+          setShareMessage("✅ Conquistas compartilhadas!")
+        } else {
+          downloadImage(canvas, 'minhas-conquistas-purify.png')
+        }
+      } else {
+        downloadImage(canvas, 'minhas-conquistas-purify.png')
+      }
+
+    } catch (error) {
+      console.error('Erro ao capturar/compartilhar:', error)
+      setShareMessage("⚠️ Erro ao gerar imagem")
+    } finally {
+      setIsCapturing(false)
+      setTimeout(() => setShareMessage(null), 4000)
+    }
+  }
+
+  const downloadImage = (canvas: HTMLCanvasElement, filename: string) => {
+    const link = document.createElement('a')
+    link.download = filename
+    link.href = canvas.toDataURL('image/png', 1.0)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    setShareMessage("📱 Conquistas salvas! Compartilhe suas vitórias!")
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header com Nível e Pontos */}
@@ -295,7 +382,7 @@ export default function GamificacaoPage() {
 
       <div className="px-4 -mt-2 relative z-20 space-y-4">
         {/* Conquistas Desbloqueadas */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+        <div ref={achievementsCardRef} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
               <Trophy className="text-white" size={20} />
@@ -470,6 +557,46 @@ export default function GamificacaoPage() {
             </div>
           </div>
         </div>
+
+        {/* Botão de Compartilhar Conquistas */}
+        <div className="px-4 pb-4">
+          <button
+            onClick={handleShareAchievements}
+            disabled={isCapturing || shareMessage !== null}
+            className={`w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] native-button-press flex items-center justify-center gap-3 ${(isCapturing || shareMessage) ? 'opacity-75 cursor-not-allowed' : ''}`}
+          >
+            {isCapturing ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Capturando...</span>
+              </>
+            ) : shareMessage ? (
+              <>
+                <CheckCircle size={20} />
+                <span>Sucesso!</span>
+              </>
+            ) : (
+              <>
+                <Share2 size={20} />
+                <span>Compartilhar Conquistas</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Toast de feedback */}
+        {shareMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 max-w-sm mx-auto animate-spring-in">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="text-purple-600" size={16} />
+                </div>
+                <p className="text-gray-800 font-medium text-sm">{shareMessage}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <BottomNavigation />

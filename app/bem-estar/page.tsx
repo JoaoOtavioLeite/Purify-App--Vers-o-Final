@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
 import { 
   Heart, 
@@ -33,9 +33,13 @@ import {
   Gift,
   ChevronRight,
   Play,
-  Pause
+  Pause,
+  Share2
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
+import { useHaptics } from "@/lib/haptics"
+import { useDeviceFeatures } from "@/lib/device-features"
+import html2canvas from "html2canvas"
 
 interface DailyQuestion {
   id: string

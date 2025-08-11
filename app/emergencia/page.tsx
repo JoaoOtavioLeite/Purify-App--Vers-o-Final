@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
 import { 
   Shield, 
@@ -21,9 +21,17 @@ import {
   ChevronLeft,
   Quote,
   Cross,
-  RefreshCw
+  RefreshCw,
+  Share2,
+  Trophy,
+  Star,
+  Award,
+  Flame
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
+import { useHaptics } from "@/lib/haptics"
+import { useDeviceFeatures } from "@/lib/device-features"
+import html2canvas from "html2canvas"
 
 export default function EmergenciaPage() {
   const { data } = useAddiction()
@@ -33,6 +41,18 @@ export default function EmergenciaPage() {
   const [isBreathing, setIsBreathing] = useState(false)
   const [completedActivities, setCompletedActivities] = useState<string[]>([])
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null)
+  const [showVictoryModal, setShowVictoryModal] = useState(false)
+  const [sosVictories, setSosVictories] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return parseInt(localStorage.getItem('sosVictories') || '0')
+    }
+    return 0
+  })
+  const [shareMessage, setShareMessage] = useState<string | null>(null)
+  const [isCapturing, setIsCapturing] = useState(false)
+  const victoryCardRef = useRef<HTMLDivElement>(null)
+  const haptics = useHaptics()
+  const { share } = useDeviceFeatures()
 
   // Conteúdo bíblico baseado nas emoções
   const biblicalContent = {
@@ -223,6 +243,107 @@ export default function EmergenciaPage() {
     if (!completedActivities.includes(activityId)) {
       setCompletedActivities([...completedActivities, activityId])
     }
+  }
+
+  // Função para registrar vitória SOS
+  const handleSOSVictory = () => {
+    haptics.success()
+    const newVictoryCount = sosVictories + 1
+    setSosVictories(newVictoryCount)
+    
+    // Salvar no localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sosVictories', newVictoryCount.toString())
+    }
+    
+    setShowVictoryModal(true)
+    
+    // Fechar modal automaticamente após 5 segundos
+    setTimeout(() => {
+      setShowVictoryModal(false)
+    }, 5000)
+  }
+
+  // Função para compartilhar vitória
+  const handleShareVictory = async () => {
+    haptics.medium()
+    setIsCapturing(true)
+    setShareMessage("📸 Capturando vitória...")
+
+    try {
+      if (!victoryCardRef.current) {
+        throw new Error("Elemento não encontrado")
+      }
+
+      const canvas = await html2canvas(victoryCardRef.current, {
+        backgroundColor: '#f8fafc',
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        removeContainer: false,
+        foreignObjectRendering: false,
+        imageTimeout: 0,
+        logging: false,
+        width: victoryCardRef.current.offsetWidth,
+        height: victoryCardRef.current.offsetHeight,
+      })
+
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+        }, 'image/png', 1.0)
+      })
+
+      if (!blob) {
+        throw new Error("Erro ao gerar imagem")
+      }
+
+      const file = new File([blob], 'vitoria-sos-purify.png', { type: 'image/png' })
+
+      if (typeof navigator !== 'undefined' && 'share' in navigator && 'canShare' in navigator) {
+        const shareData = {
+          title: 'Vitória SOS - Purify',
+          text: `💪 VITÓRIA! Resisti ao impulso!
+
+🛡️ Usei as técnicas SOS do Purify
+🧠 Respiração 4-7-8 me acalmou
+🏃‍♂️ Atividades saudáveis me distraíram
+🙏 Encontrei força na fé
+
+🔥 Já são ${sosVictories} vitórias registradas!
+Cada resistência me torna mais forte!
+
+#Purify #VitóriaSOS #SuperaçãoDeVícios #FocoNaJornada`,
+          files: [file]
+        }
+
+        if (navigator.canShare && navigator.canShare(shareData)) {
+          await navigator.share(shareData)
+          setShareMessage("✅ Vitória compartilhada!")
+        } else {
+          downloadVictoryImage(canvas)
+        }
+      } else {
+        downloadVictoryImage(canvas)
+      }
+
+    } catch (error) {
+      console.error('Erro ao capturar/compartilhar:', error)
+      setShareMessage("⚠️ Erro ao gerar imagem")
+    } finally {
+      setIsCapturing(false)
+      setTimeout(() => setShareMessage(null), 4000)
+    }
+  }
+
+  const downloadVictoryImage = (canvas: HTMLCanvasElement) => {
+    const link = document.createElement('a')
+    link.download = 'vitoria-sos-purify.png'
+    link.href = canvas.toDataURL('image/png', 1.0)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    setShareMessage("📱 Vitória salva! Compartilhe sua superação!")
   }
 
   const getBreathingInstruction = () => {
@@ -518,6 +639,111 @@ export default function EmergenciaPage() {
             </p>
           </div>
         </div>
+
+        {/* Botão Consegui Resistir! */}
+        <div className="px-4 pb-4">
+          <button
+            onClick={handleSOSVictory}
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] native-button-press flex items-center justify-center gap-3"
+          >
+            <Trophy size={24} />
+            <span>💪 Consegui Resistir!</span>
+            <Star size={20} />
+          </button>
+          {sosVictories > 0 && (
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-600 font-medium">
+                🔥 {sosVictories} vitória{sosVictories > 1 ? 's' : ''} registrada{sosVictories > 1 ? 's' : ''}!
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Modal de Vitória */}
+        {showVictoryModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in px-4">
+            <div 
+              ref={victoryCardRef}
+              className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl p-8 shadow-2xl max-w-sm mx-auto text-center animate-spring-in relative overflow-hidden"
+            >
+              {/* Decorações de fundo */}
+              <div className="absolute top-4 right-4 w-16 h-16 bg-white/20 rounded-full blur-xl"></div>
+              <div className="absolute bottom-4 left-4 w-12 h-12 bg-white/15 rounded-full blur-lg"></div>
+              
+              <div className="relative z-10">
+                {/* Ícone de Vitória */}
+                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                  <Trophy className="text-white" size={40} />
+                </div>
+                
+                {/* Título */}
+                <h2 className="text-3xl font-extrabold text-white mb-2">
+                  🏆 VITÓRIA!
+                </h2>
+                <p className="text-white/90 text-lg font-semibold mb-4">
+                  Você resistiu ao impulso!
+                </p>
+                
+                {/* Contador de Vitórias */}
+                <div className="bg-white/20 rounded-2xl p-4 mb-6">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Flame className="text-orange-300" size={24} />
+                    <span className="text-2xl font-bold text-white">{sosVictories}</span>
+                    <Award className="text-yellow-300" size={24} />
+                  </div>
+                  <p className="text-white/80 text-sm">
+                    Vitória{sosVictories > 1 ? 's' : ''} SOS registrada{sosVictories > 1 ? 's' : ''}!
+                  </p>
+                </div>
+                
+                {/* Mensagem Motivacional */}
+                <p className="text-white/90 text-sm leading-relaxed mb-6">
+                  🧠 <strong>Sua mente ficou mais forte!</strong><br/>
+                  Cada resistência reconstrói seus circuitos neurais.<br/>
+                  🔥 <strong>Você está se transformando!</strong>
+                </p>
+                
+                {/* Botões */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowVictoryModal(false)}
+                    className="flex-1 bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-4 rounded-xl transition-all native-button-press"
+                  >
+                    ✨ Continuar
+                  </button>
+                  <button
+                    onClick={handleShareVictory}
+                    disabled={isCapturing}
+                    className="flex-1 bg-white/90 hover:bg-white text-emerald-600 font-semibold py-3 px-4 rounded-xl transition-all native-button-press flex items-center justify-center gap-2"
+                  >
+                    {isCapturing ? (
+                      <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <Share2 size={16} />
+                        <span>Compartilhar</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Toast de feedback */}
+        {shareMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 max-w-sm mx-auto animate-spring-in">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="text-green-600" size={16} />
+                </div>
+                <p className="text-gray-800 font-medium text-sm">{shareMessage}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <BottomNavigation />

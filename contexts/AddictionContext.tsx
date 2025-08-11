@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import { getNotifications } from "@/lib/notifications"
+import { useNotifications } from "@/lib/notifications"
 
 export interface AddictionType {
   id: string
@@ -166,6 +166,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
 
   const [currentTime, setCurrentTime] = useState(new Date())
   const [lastNotifiedDay, setLastNotifiedDay] = useState(0)
+  const notifications = useNotifications()
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -174,26 +175,58 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(timer)
   }, [])
 
-  // Verificar marcos e enviar notificações
+  // Inicializar sistema de notificações
+  useEffect(() => {
+    const initNotifications = async () => {
+      try {
+        const initialized = await notifications.initialize()
+        if (initialized) {
+          console.log('🔔 Sistema de notificações inicializado')
+        }
+      } catch (error) {
+        console.log('❌ Erro ao inicializar notificações:', error)
+      }
+    }
+
+    initNotifications()
+  }, [])
+
+  // Verificar marcos e agendar notificações de progresso
   useEffect(() => {
     if (data.streakStart) {
       const timeAbstinent = getTimeAbstinent()
       const currentDays = timeAbstinent.days
       
-      // Verificar se é um marco importante e se ainda não foi notificado
-      const milestones = [1, 3, 7, 15, 30, 60, 90, 180, 365]
+      // Marcos importantes que devem gerar notificações
+      const milestones = [1, 3, 7, 14, 30, 60, 90, 180, 365]
       
+      // Verificar se completou um marco hoje
       if (milestones.includes(currentDays) && currentDays > lastNotifiedDay) {
-        try {
-          const notifications = getNotifications()
-          notifications.sendMilestoneNotification?.(currentDays)
-          setLastNotifiedDay(currentDays)
-        } catch (error) {
-          console.log('Notificações não disponíveis:', error)
+        console.log(`🎯 Marco alcançado: ${currentDays} dias`)
+        setLastNotifiedDay(currentDays)
+        
+        // Salvar último dia notificado
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lastNotifiedDay', currentDays.toString())
         }
       }
+
+      // Agendar notificação para o próximo marco diário (sempre às 00:01)
+      if (notifications.hasPermission()) {
+        notifications.scheduleMilestoneNotification(currentDays)
+      }
     }
-  }, [currentTime, data.streakStart, lastNotifiedDay])
+  }, [currentTime, data.streakStart, lastNotifiedDay, notifications])
+
+  // Carregar último dia notificado
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('lastNotifiedDay')
+      if (saved) {
+        setLastNotifiedDay(parseInt(saved))
+      }
+    }
+  }, [])
 
   // Carregar dados salvos na inicialização
   useEffect(() => {

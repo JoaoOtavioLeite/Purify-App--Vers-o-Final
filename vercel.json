@@ -4,6 +4,22 @@
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "public": true,
+  "functions": {
+    "app/**/*.{ts,tsx}": {
+      "excludeFromAuth": true
+    }
+  },
+  "auth": false,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Robots-Tag": "all"
+      }
+    }
+  ],
   "headers": [
     {
       "source": "/sw.js",
@@ -33,6 +49,22 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
+        },
+        {
+          "key": "X-Vercel-Skip-Auth",
+          "value": "true"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "all"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
         }
       ]
     }

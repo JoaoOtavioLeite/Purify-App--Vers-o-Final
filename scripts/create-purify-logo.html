@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Logo Purify - Todos os Tamanhos</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        
+        .logo-preview {
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border: 2px solid #e0e7ff;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .icon-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border: 2px solid #e0e7ff;
+        }
+        
+        .icon-item img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .download-all {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            width: 100%;
+        }
+        
+        .instructions {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💧 Gerar Logo Purify - Gota Azul</h1>
+        
+        <div class="logo-preview">
+            <h3>Prévia da Nova Logo:</h3>
+            <canvas id="logoCanvas" width="200" height="200" style="border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);"></canvas>
+            <p style="color: #666; margin-top: 15px;">Fundo azul com gota branca, "S" azul dentro e "Purify" embaixo</p>
+        </div>
+        
+        <button class="generate-btn" onclick="generateAllIcons()">
+            🚀 Gerar Todos os Ícones da Nova Logo
+        </button>
+        
+        <div class="icons-grid" id="iconsGrid"></div>
+        
+        <button class="download-all" id="downloadAllBtn" style="display: none;" onclick="downloadAll()">
+            📦 Baixar Todos os Ícones (ZIP) - Pronto para Usar!
+        </button>
+        
+        <div class="instructions">
+            <h3>📋 Como Usar:</h3>
+            <ol>
+                <li><strong>Clique em "Gerar Ícones"</strong> - A nova logo será criada em todos os tamanhos</li>
+                <li><strong>Baixe o ZIP</strong> - Contém todos os arquivos necessários</li>
+                <li><strong>Substitua na pasta public/</strong> - Cole todos os arquivos PNG</li>
+                <li><strong>Limpe o cache</strong> - Force refresh (Ctrl+F5)</li>
+                <li><strong>Teste</strong> - "Adicionar à Tela Inicial" para ver a nova logo</li>
+            </ol>
+            <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <strong>💧 Dica:</strong> Logo exatamente como na imagem enviada - fundo azul, gota branca no centro com "S" azul dentro e texto "Purify" branco embaixo. Perfeita para simbolizar purificação!
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const iconSizes = [
+            { size: 16, name: '16.png', desc: 'Favicon' },
+            { size: 32, name: '32.png', desc: 'Favicon' },
+            { size: 57, name: '57.png', desc: 'iOS' },
+            { size: 60, name: '60.png', desc: 'iOS' },
+            { size: 72, name: '72.png', desc: 'iOS/Android' },
+            { size: 76, name: '76.png', desc: 'iOS' },
+            { size: 114, name: '114.png', desc: 'iOS Retina' },
+            { size: 120, name: '120.png', desc: 'iOS Retina' },
+            { size: 144, name: '144.png', desc: 'iOS/Windows' },
+            { size: 152, name: '152.png', desc: 'iOS Retina' },
+            { size: 180, name: '180.png', desc: 'iOS Plus ⭐' },
+            { size: 192, name: '192.png', desc: 'Android ⭐' },
+            { size: 512, name: '512.png', desc: 'PWA ⭐' },
+            { size: 1024, name: '1024.png', desc: 'App Store' }
+        ];
+
+        let generatedIcons = {};
+
+        // Desenhar logo Purify - EXATAMENTE como na imagem: fundo azul, gota branca, S azul
+        function drawPurifyLogo(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const centerX = size / 2;
+            const centerY = size / 2;
+            
+            // Limpar canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Cores mais próximas da imagem enviada
+            const blueBackground = '#5BA7F7'; // Azul mais claro como na imagem
+            const whiteColor = '#FFFFFF'; // Branco da gota
+            const blueS = '#3b82f6'; // Azul do S
+            
+            // Fundo azul com cantos arredondados (iOS style)
+            const cornerRadius = size * 0.225;
+            ctx.fillStyle = blueBackground;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, cornerRadius);
+            ctx.fill();
+            
+            // Posição da gota (centralizada, ligeiramente acima do centro)
+            const dropCenterX = centerX;
+            const dropCenterY = centerY - (size * 0.05);
+            const dropScale = size * 0.35; // Tamanho da gota branca
+            
+            // Desenhar gota branca
+            drawWaterDropWhite(ctx, dropCenterX, dropCenterY, dropScale);
+            
+            // Texto "Purify" embaixo (só em tamanhos grandes)
+            if (size >= 80) {
+                const textSize = size * 0.09;
+                const textY = dropCenterY + dropScale * 0.8 + (size * 0.08);
+                
+                ctx.fillStyle = whiteColor;
+                ctx.font = `600 ${textSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                ctx.fillText('Purify', centerX, textY);
+            }
+        }
+        
+        // Função para desenhar a gota branca EXATAMENTE como na imagem
+        function drawWaterDropWhite(ctx, centerX, centerY, scale) {
+            ctx.save();
+            
+            // Gota com proporções EXATAS da imagem
+            const dropWidth = scale * 0.6;   // Mais estreita
+            const dropHeight = scale * 1.6;  // Mais alongada
+            
+            // Desenhar gota branca com forma mais precisa
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            
+            // Topo pontudo (mais agudo)
+            ctx.moveTo(centerX, centerY - dropHeight/2);
+            
+            // Curva esquerda - mais suave e simétrica
+            ctx.bezierCurveTo(
+                centerX - dropWidth/4, centerY - dropHeight/2.5,  // Controle superior
+                centerX - dropWidth/2, centerY - dropHeight/8,    // Controle lateral
+                centerX - dropWidth/2.2, centerY + dropHeight/4   // Ponto médio
+            );
+            
+            // Curva inferior esquerda
+            ctx.bezierCurveTo(
+                centerX - dropWidth/3, centerY + dropHeight/2.5,
+                centerX - dropWidth/8, centerY + dropHeight/2.2,
+                centerX, centerY + dropHeight/2.1  // Base ligeiramente arredondada
+            );
+            
+            // Curva inferior direita
+            ctx.bezierCurveTo(
+                centerX + dropWidth/8, centerY + dropHeight/2.2,
+                centerX + dropWidth/3, centerY + dropHeight/2.5,
+                centerX + dropWidth/2.2, centerY + dropHeight/4
+            );
+            
+            // Curva direita
+            ctx.bezierCurveTo(
+                centerX + dropWidth/2, centerY - dropHeight/8,
+                centerX + dropWidth/4, centerY - dropHeight/2.5,
+                centerX, centerY - dropHeight/2
+            );
+            
+            ctx.fill();
+            
+            // S com melhor posicionamento e fonte
+            if (scale >= 12) {
+                const sSize = scale * 0.65;
+                ctx.fillStyle = '#3b82f6'; // Azul mais próximo da imagem
+                
+                // Tentar fontes mais próximas da imagem
+                ctx.font = `700 ${sSize}px -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // S ligeiramente acima do centro da gota
+                ctx.fillText('S', centerX, centerY - scale * 0.02);
+            }
+            
+            ctx.restore();
+        }
+
+        // Desenhar logo inicial
+        function drawInitialLogo() {
+            const canvas = document.getElementById('logoCanvas');
+            drawPurifyLogo(canvas, 200);
+        }
+
+        // Gerar todos os ícones
+        async function generateAllIcons() {
+            const iconsGrid = document.getElementById('iconsGrid');
+            iconsGrid.innerHTML = '';
+            generatedIcons = {};
+
+            for (const iconConfig of iconSizes) {
+                const canvas = document.createElement('canvas');
+                canvas.width = iconConfig.size;
+                canvas.height = iconConfig.size;
+                
+                // Desenhar logo no tamanho específico
+                drawPurifyLogo(canvas, iconConfig.size);
+                
+                // Converter para blob
+                const blob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/png');
+                });
+                
+                generatedIcons[iconConfig.name] = blob;
+                
+                // Criar elemento visual
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-item';
+                iconItem.innerHTML = `
+                    <img src="${canvas.toDataURL()}" alt="${iconConfig.name}">
+                    <div style="font-weight: bold; color: #333;">${iconConfig.size}x${iconConfig.size}</div>
+                    <div style="font-size: 11px; color: #666;">${iconConfig.desc}</div>
+                `;
+                iconsGrid.appendChild(iconItem);
+                
+                // Pequena pausa para mostrar progresso
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            document.getElementById('downloadAllBtn').style.display = 'block';
+        }
+
+        // Download de todos os ícones
+        async function downloadAll() {
+            const zip = new JSZip();
+            
+            // Adicionar todos os ícones ao ZIP
+            for (const [filename, blob] of Object.entries(generatedIcons)) {
+                zip.file(filename, blob);
+            }
+            
+            // Adicionar instruções
+            const instructions = `
+🎨 NOVA LOGO PURIFY - INSTRUÇÕES DE INSTALAÇÃO
+
+📋 PASSOS:
+1. Copie TODOS os arquivos PNG para a pasta public/ do seu projeto
+2. Substitua os arquivos existentes
+3. Force refresh no navegador: Ctrl+F5
+4. Teste "Adicionar à Tela Inicial" no mobile
+
+📱 PRINCIPAIS ARQUIVOS:
+- 180.png = iOS principal (iPhone/iPad "Adicionar à Tela Inicial")
+- 192.png = Android principal (Chrome "Instalar app")  
+- 512.png = PWA principal (app instalado, splash screen)
+- 32.png = Favicon principal (aba do navegador)
+- 16.png = Favicon pequeno
+
+⚠️ CACHE:
+- Pode levar alguns minutos para atualizar
+- Force refresh várias vezes se necessário
+- No mobile, remova e adicione novamente à tela inicial
+
+✅ RESULTADO:
+Sua nova logo Purify aparecerá em:
+- Ícone na home screen (iOS/Android)
+- Favicon no navegador  
+- Splash screen do app
+- Notificações push
+- PWA instalado
+
+Gerado em: ${new Date().toLocaleString('pt-BR')}
+            `;
+            
+            zip.file('COMO-INSTALAR.txt', instructions);
+            
+            // Gerar e baixar ZIP
+            const content = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `purify-nova-logo-${Date.now()}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Polyfill para roundRect (navegadores antigos)
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+
+        // Desenhar logo inicial quando a página carregar
+        document.addEventListener('DOMContentLoaded', drawInitialLogo);
+    </script>
+</body>
+</html>

@@ -1,279 +1,264 @@
-"use client"
+/**
+ * Sistema de Notificações Push - Purify App
+ * Gerencia permissões, agendamento e configurações de notificações
+ */
 
-// Sistema de Notificações para PWA
-export class PWANotifications {
-  private static instance: PWANotifications
-  private permission: NotificationPermission = 'default'
-  private isSupported = false
-  private worker: ServiceWorker | null = null
+export interface NotificationTime {
+  time: string // HH:MM format
+  enabled: boolean
+  label: string
+}
 
-  constructor() {
-    this.checkSupport()
-    this.getPermission()
+export interface NotificationSettings {
+  morning: NotificationTime
+  afternoon: NotificationTime
+  evening: NotificationTime
+  night: NotificationTime
+  milestones: boolean
+  permission: NotificationPermission
+}
+
+// Configurações padrão de notificações
+export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
+  morning: {
+    time: '08:00',
+    enabled: true,
+    label: 'Manhã (Motivação)'
+  },
+  afternoon: {
+    time: '14:00',
+    enabled: true,
+    label: 'Tarde (Check-in)'
+  },
+  evening: {
+    time: '19:00',
+    enabled: true,
+    label: 'Noite (Força Final)'
+  },
+  night: {
+    time: '22:00',
+    enabled: true,
+    label: 'Boa Noite (Celebração)'
+  },
+  milestones: true,
+  permission: 'default'
+}
+
+export class NotificationManager {
+  private static instance: NotificationManager
+  private serviceWorkerRegistration: ServiceWorkerRegistration | null = null
+  private settings: NotificationSettings
+
+  private constructor() {
+    this.settings = this.loadSettings()
   }
 
-  static getInstance(): PWANotifications {
-    if (!PWANotifications.instance) {
-      PWANotifications.instance = new PWANotifications()
+  static getInstance(): NotificationManager {
+    if (!NotificationManager.instance) {
+      NotificationManager.instance = new NotificationManager()
     }
-    return PWANotifications.instance
+    return NotificationManager.instance
   }
 
-  private checkSupport() {
-    if (typeof window === 'undefined') {
-      this.isSupported = false
-      return
-    }
-    this.isSupported = 'Notification' in window && 'serviceWorker' in navigator
-  }
+  // Inicializar sistema de notificações
+  async initialize(): Promise<boolean> {
+    try {
+      if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+        console.log('🚫 Service Workers não suportados')
+        return false
+      }
 
-  private getPermission() {
-    if (typeof window === 'undefined') {
-      this.permission = 'default'
-      return
-    }
-    if (this.isSupported) {
-      this.permission = Notification.permission
-    }
-  }
+      // Registrar service worker específico para notificações
+      this.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw-notifications.js', {
+        scope: '/'
+      })
 
-  // Solicitar permissão para notificações
-  async requestPermission(): Promise<boolean> {
-    if (typeof window === 'undefined' || !this.isSupported) {
-      console.warn('Notificações não são suportadas neste ambiente')
+      console.log('🔔 Service Worker de notificações registrado')
+
+      // Verificar permissão atual
+      this.settings.permission = Notification.permission
+
+      // Se já tiver permissão, configurar notificações
+      if (this.settings.permission === 'granted') {
+        await this.scheduleAllNotifications()
+      }
+
+      return true
+    } catch (error) {
+      console.error('❌ Erro ao inicializar notificações:', error)
       return false
     }
-
-    if (this.permission === 'granted') {
-      return true
-    }
-
-    const permission = await Notification.requestPermission()
-    this.permission = permission
-    
-    if (permission === 'granted') {
-      this.setupServiceWorker()
-      this.sendTestNotification()
-      this.scheduleWelcomeNotifications()
-      return true
-    }
-
-    return false
   }
 
-  // Configurar Service Worker para notificações em background
-  private async setupServiceWorker() {
-    if (typeof window === 'undefined') return
-    if ('serviceWorker' in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.register('/sw.js')
-        
-        if (registration.installing) {
-          this.worker = registration.installing
-        } else if (registration.waiting) {
-          this.worker = registration.waiting
-        } else if (registration.active) {
-          this.worker = registration.active
-        }
-
-        console.log('Service Worker registrado para notificações')
-      } catch (error) {
-        console.error('Erro ao registrar Service Worker:', error)
+  // Solicitar permissão de notificações
+  async requestPermission(): Promise<NotificationPermission> {
+    try {
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        console.log('🚫 Notificações não suportadas neste dispositivo')
+        return 'denied'
       }
+
+      const permission = await Notification.requestPermission()
+      this.settings.permission = permission
+      this.saveSettings()
+
+      if (permission === 'granted') {
+        console.log('✅ Permissão de notificações concedida')
+        await this.scheduleAllNotifications()
+      } else {
+        console.log('🚫 Permissão de notificações negada')
+      }
+
+      return permission
+    } catch (error) {
+      console.error('❌ Erro ao solicitar permissão:', error)
+      return 'denied'
+    }
+  }
+
+  // Verificar se notificações estão disponíveis
+  isAvailable(): boolean {
+    return typeof window !== 'undefined' && 
+           'Notification' in window && 
+           'serviceWorker' in navigator
+  }
+
+  // Verificar se permissão foi concedida
+  hasPermission(): boolean {
+    return this.settings.permission === 'granted'
+  }
+
+  // Obter configurações atuais
+  getSettings(): NotificationSettings {
+    return { ...this.settings }
+  }
+
+  // Atualizar configurações
+  async updateSettings(newSettings: Partial<NotificationSettings>): Promise<void> {
+    this.settings = { ...this.settings, ...newSettings }
+    this.saveSettings()
+
+    if (this.hasPermission()) {
+      await this.scheduleAllNotifications()
+    }
+  }
+
+  // Agendar todas as notificações
+  async scheduleAllNotifications(): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission()) {
+        console.log('🚫 Não é possível agendar - sem permissão ou SW')
+        return
+      }
+
+      // Enviar configurações para o service worker
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_DAILY_NOTIFICATIONS',
+        data: {
+          times: {
+            morning: this.settings.morning,
+            afternoon: this.settings.afternoon,
+            evening: this.settings.evening,
+            night: this.settings.night
+          }
+        }
+      })
+
+      console.log('📅 Notificações diárias reagendadas')
+    } catch (error) {
+      console.error('❌ Erro ao agendar notificações:', error)
+    }
+  }
+
+  // Agendar notificação de marco (dias completos)
+  async scheduleMilestoneNotification(currentDays: number): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.milestones) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_MILESTONE_NOTIFICATION',
+        data: { days: currentDays }
+      })
+
+      console.log(`🎯 Notificação de marco agendada para ${currentDays + 1} dias`)
+    } catch (error) {
+      console.error('❌ Erro ao agendar marco:', error)
     }
   }
 
   // Enviar notificação de teste
-  private sendTestNotification() {
-    this.sendNotification(
-      'Purify - Notificações Ativadas! 🎉',
-      'Você receberá lembretes motivacionais para te ajudar na sua jornada',
-      '/192.png'
-    )
-  }
-
-  // Enviar notificação local
-  sendNotification(title: string, body: string, icon: string = '/192.png') {
-    if (typeof window === 'undefined') return
-    if (this.permission !== 'granted') {
-      console.warn('Permissão para notificações não concedida')
-      return
-    }
-
-    const options: NotificationOptions = {
-      body,
-      icon,
-      badge: '/192.png',
-      tag: 'purify-notification',
-      requireInteraction: false,
-      silent: false
-    }
-
-    new Notification(title, options)
-  }
-
-  // Agendar notificações de boas-vindas
-  private scheduleWelcomeNotifications() {
-    // Notificação após 1 hora
-    setTimeout(() => {
-      this.sendNotification(
-        'Como você está se sentindo? 💙',
-        'Que tal fazer um check-in de bem-estar? Sua jornada importa!',
-        '/192.png'
-      )
-    }, 60 * 60 * 1000) // 1 hora
-
-    // Notificação diária de motivação
-    this.scheduleDailyMotivation()
-  }
-
-  // Agendar notificações diárias de motivação
-  scheduleDailyMotivation() {
-    const now = new Date()
-    const tomorrow = new Date(now)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-    tomorrow.setHours(9, 0, 0, 0) // 9h da manhã
-
-    const timeUntilTomorrow = tomorrow.getTime() - now.getTime()
-
-    setTimeout(() => {
-      this.sendDailyMotivation()
-      // Reagendar para o próximo dia
-      setInterval(() => {
-        this.sendDailyMotivation()
-      }, 24 * 60 * 60 * 1000) // A cada 24 horas
-    }, timeUntilTomorrow)
-  }
-
-  // Enviar notificação diária de motivação
-  private sendDailyMotivation() {
-    const motivations = [
-      {
-        title: 'Bom dia, Guerreiro! ☀️',
-        body: 'Um novo dia, uma nova oportunidade de crescer. Você consegue!'
-      },
-      {
-        title: 'Força e Fé! 💪',
-        body: 'Cada momento de resistência te torna mais forte. Continue firme!'
-      },
-      {
-        title: 'Você é Especial! ⭐',
-        body: 'Sua jornada de purificação inspira outros. Continue brilhando!'
-      },
-      {
-        title: 'Progresso Diário! 📈',
-        body: 'Pequenos passos levam a grandes vitórias. Que tal fazer seu check-in?'
-      },
-      {
-        title: 'Mindfulness & Paz! 🧘‍♂️',
-        body: 'Reserve um momento para respirar e conectar-se consigo mesmo hoje.'
+  async sendTestNotification(): Promise<void> {
+    try {
+      if (!this.hasPermission()) {
+        throw new Error('Sem permissão para notificações')
       }
-    ]
 
-    const randomMotivation = motivations[Math.floor(Math.random() * motivations.length)]
-    this.sendNotification(randomMotivation.title, randomMotivation.body)
-  }
+      const registration = await navigator.serviceWorker.ready
+      await registration.showNotification('🧪 Teste - Purify', {
+        body: 'Esta é uma notificação de teste! O sistema está funcionando perfeitamente.',
+        icon: '/192.png',
+        badge: '/72.png',
+        tag: 'purify-test',
+        data: { type: 'test' },
+        actions: [
+          { action: 'open', title: '✨ Abrir App' }
+        ],
+        vibrate: [200, 100, 200]
+      })
 
-  // Notificação de parabéns por marco atingido
-  sendMilestoneNotification(days: number) {
-    let title = ''
-    let body = ''
-    
-    if (days === 1) {
-      title = 'Primeiro Dia Completo! 🥇'
-      body = 'Parabéns! Você completou seu primeiro dia. Isso é só o começo!'
-    } else if (days === 7) {
-      title = 'Uma Semana Incrível! 🎉'
-      body = 'Sete dias de força e determinação. Você está arrasando!'
-    } else if (days === 30) {
-      title = 'Um Mês Fantástico! 🏆'
-      body = 'Trinta dias de purificação! Sua disciplina é inspiradora!'
-    } else if (days === 90) {
-      title = 'Três Meses de Vitória! 👑'
-      body = 'Noventa dias! Você provou que tem o controle da sua vida!'
-    } else if (days % 100 === 0) {
-      title = `${days} Dias de Glória! 🌟`
-      body = 'Você é um verdadeiro exemplo de perseverança e crescimento!'
-    }
-
-    if (title) {
-      this.sendNotification(title, body)
+      console.log('🧪 Notificação de teste enviada')
+    } catch (error) {
+      console.error('❌ Erro ao enviar teste:', error)
+      throw error
     }
   }
 
-  // Notificação de lembrete para check-in
-  sendCheckinReminder() {
-    this.sendNotification(
-      'Hora do Check-in! 📋',
-      'Como você está hoje? Faça seu check-in de bem-estar!',
-      '/192.png'
-    )
+  // Carregar configurações do localStorage
+  private loadSettings(): NotificationSettings {
+    try {
+      if (typeof window === 'undefined') return DEFAULT_NOTIFICATION_SETTINGS
+
+      const saved = localStorage.getItem('notificationSettings')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        return { ...DEFAULT_NOTIFICATION_SETTINGS, ...parsed }
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar configurações:', error)
+    }
+
+    return DEFAULT_NOTIFICATION_SETTINGS
   }
 
-  // Notificação de emergência (para uso em momentos difíceis)
-  sendEmergencySupport() {
-    this.sendNotification(
-      'Você é Mais Forte! 🛡️',
-      'Momentos difíceis passam. Respire fundo e lembre-se do seu porquê.',
-      '/192.png'
-    )
-  }
-
-  // Verificar se notificações estão habilitadas
-  isEnabled(): boolean {
-    return this.permission === 'granted'
-  }
-
-  // Desabilitar notificações
-  disable() {
-    // Note: Não é possível revogar permissão programaticamente
-    // O usuário deve fazer isso manualmente nas configurações do navegador
-    localStorage.setItem('notifications_disabled', 'true')
-  }
-
-  // Verificar se foi desabilitado pelo usuário
-  isDisabledByUser(): boolean {
-    return localStorage.getItem('notifications_disabled') === 'true'
+  // Salvar configurações no localStorage
+  private saveSettings(): void {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('notificationSettings', JSON.stringify(this.settings))
+      }
+    } catch (error) {
+      console.error('❌ Erro ao salvar configurações:', error)
+    }
   }
 }
 
-// Instância global - lazy initialization
-let _notificationsInstance: PWANotifications | null = null
+// Hook para usar o sistema de notificações
+export const useNotifications = () => {
+  const manager = NotificationManager.getInstance()
 
-export const getNotifications = () => {
-  if (typeof window === 'undefined') {
-    // Return mock for SSR
-    return {
-      requestPermission: async () => false,
-      isEnabled: () => false,
-      sendMilestoneNotification: () => {},
-      sendCheckinReminder: () => {},
-      sendEmergencySupport: () => {},
-      disable: () => {},
-      isDisabledByUser: () => false
-    }
-  }
-  
-  if (!_notificationsInstance) {
-    _notificationsInstance = PWANotifications.getInstance()
-  }
-  return _notificationsInstance
-}
-
-export const notifications = getNotifications()
-
-// Hook para React
-export function useNotifications() {
-  const notificationsInstance = getNotifications()
-  
   return {
-    notifications: notificationsInstance,
-    requestPermission: () => notificationsInstance.requestPermission?.() || Promise.resolve(false),
-    isEnabled: () => notificationsInstance.isEnabled?.() || false,
-    sendMilestone: (days: number) => notificationsInstance.sendMilestoneNotification?.(days),
-    sendCheckinReminder: () => notificationsInstance.sendCheckinReminder?.(),
-    sendEmergencySupport: () => notificationsInstance.sendEmergencySupport?.(),
-    disable: () => notificationsInstance.disable?.(),
-    isDisabledByUser: () => notificationsInstance.isDisabledByUser?.() || false
+    initialize: () => manager.initialize(),
+    requestPermission: () => manager.requestPermission(),
+    isAvailable: () => manager.isAvailable(),
+    hasPermission: () => manager.hasPermission(),
+    getSettings: () => manager.getSettings(),
+    updateSettings: (settings: Partial<NotificationSettings>) => 
+      manager.updateSettings(settings),
+    scheduleAllNotifications: () => manager.scheduleAllNotifications(),
+    scheduleMilestoneNotification: (days: number) => 
+      manager.scheduleMilestoneNotification(days),
+    sendTestNotification: () => manager.sendTestNotification()
   }
 }

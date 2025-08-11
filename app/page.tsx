@@ -239,16 +239,76 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Dashboard Integrado */}
+        {/* Widget de Força Diária */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100/50 overflow-hidden">
-          <div className="bg-blue-500 px-5 py-4">
+          <div className="bg-gradient-to-r from-violet-500 to-purple-600 px-5 py-4">
             <h2 className="text-white font-semibold text-base flex items-center gap-2">
-              <Target className="text-white" size={18} />
-              Seu Progresso
+              <Heart className="text-white" size={18} />
+              Força para Hoje
             </h2>
           </div>
-          <div className="p-0">
-            <Dashboard />
+          <div className="p-5 space-y-4">
+            {/* Resumo Rápido */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl flex items-center justify-center">
+                  <Flame className="text-green-600" size={24} />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {timeAbstinent.days > 0 ? timeAbstinent.days : timeAbstinent.hours > 0 ? timeAbstinent.hours : timeAbstinent.minutes}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {timeAbstinent.days > 0
+                      ? timeAbstinent.days === 1 ? "dia limpo" : "dias limpos"
+                      : timeAbstinent.hours > 0
+                        ? timeAbstinent.hours === 1 ? "hora limpa" : "horas limpas"
+                        : timeAbstinent.minutes === 1 ? "minuto limpo" : "minutos limpos"}
+                  </div>
+                </div>
+              </div>
+              <Link 
+                href="/estatistica"
+                className="text-violet-600 hover:text-violet-700 font-medium text-sm flex items-center gap-1"
+              >
+                Ver detalhes <ChevronRight size={16} />
+              </Link>
+            </div>
+
+            {/* Progresso para Próximo Marco */}
+            {progress < 100 && (
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700">Próximo marco</span>
+                  <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-violet-500 to-purple-600 rounded-full transition-all duration-1000 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="text-xs text-gray-500 text-center">
+                  Continue forte! Você está indo muito bem! 💪
+                </div>
+              </div>
+            )}
+
+            {/* Ação Rápida */}
+            <div className="flex gap-3">
+              <Link 
+                href="/motivacao"
+                className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-medium py-3 px-4 rounded-xl transition-all text-center text-sm native-button-press"
+              >
+                ✨ Motivação
+              </Link>
+              <Link 
+                href="/emergencia"
+                className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-medium py-3 px-4 rounded-xl transition-all text-center text-sm native-button-press"
+              >
+                🚨 SOS
+              </Link>
+            </div>
           </div>
         </div>
 

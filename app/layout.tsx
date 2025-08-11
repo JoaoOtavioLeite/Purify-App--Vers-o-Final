@@ -4,6 +4,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { AddictionProvider } from "@/contexts/AddictionContext"
 import InstallPWA from "@/components/InstallPWA"
+import { SplashScreenWrapper } from "@/components/SplashScreenWrapper"
+import { FloatingActionButton } from "@/components/FloatingActionButton"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -87,10 +89,13 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-gradient-to-br from-blue-50 to-sky-100 text-gray-800 min-h-screen`}>
         <AddictionProvider>
-          <div className="max-w-sm mx-auto min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 relative">
-            {children}
-            <InstallPWA />
-          </div>
+          <SplashScreenWrapper>
+            <div className="max-w-sm mx-auto min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 relative">
+              {children}
+              <InstallPWA />
+              <FloatingActionButton />
+            </div>
+          </SplashScreenWrapper>
         </AddictionProvider>
       </body>
     </html>
