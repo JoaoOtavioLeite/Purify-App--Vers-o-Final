@@ -39,7 +39,7 @@ import {
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
 import { useHaptics } from "@/lib/haptics"
 import { useDeviceFeatures } from "@/lib/device-features"
-import html2canvas from "html2canvas"
+// import html2canvas from "html2canvas"
 
 interface DailyQuestion {
   id: string

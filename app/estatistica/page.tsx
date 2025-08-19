@@ -37,7 +37,7 @@ import { BottomNavigation } from "@/components/ui/BottomNavigation"
 import { useState, useEffect, useRef } from "react"
 import { useHaptics } from "@/lib/haptics"
 import { useDeviceFeatures } from "@/lib/device-features"
-import html2canvas from "html2canvas"
+// import html2canvas from "html2canvas"
 
 export default function EstatisticaPage() {
   const { data, getTimeAbstinent, resetStreak } = useAddiction()
@@ -70,6 +70,7 @@ export default function EstatisticaPage() {
       }
 
       // Capturar screenshot do card de progresso
+      const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(progressCardRef.current, {
         backgroundColor: '#f8fafc', // Cor de fundo consistente
         scale: 2, // Alta qualidade

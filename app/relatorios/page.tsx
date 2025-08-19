@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
 import { 
   TrendingUp, 
@@ -23,9 +23,18 @@ import {
   Timer,
   Users,
   Flame,
-  Shield
+  Shield,
+  CheckCircle,
+  ArrowUp,
+  ArrowDown,
+  Minus
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
+import { LoadingState, SectionLoadingState } from "@/components/ui/LoadingState"
+import { SkeletonCard, SkeletonStats } from "@/components/ui/SkeletonLoader"
+import { SimpleChart, SimplePieChart } from "@/components/ui/SimpleChart"
+import { useDataLoader } from "@/hooks/use-async-state"
+// import html2canvas from "html2canvas"
 
 interface WeeklyData {
   week: string
@@ -48,8 +57,20 @@ export default function RelatoriosPage() {
   const { data, getTimeAbstinent } = useAddiction()
   const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month" | "year">("month")
   const [showDetailedView, setShowDetailedView] = useState(false)
-
+  const [isLoading, setIsLoading] = useState(true)
+  const [shareMessage, setShareMessage] = useState<string | null>(null)
+  const reportRef = useRef<HTMLDivElement>(null)
+  
   const timeAbstinent = getTimeAbstinent()
+  const reportDataLoader = useDataLoader()
+
+  // Simular carregamento inicial
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Dados simulados para demonstração
   const weeklyData: WeeklyData[] = [
@@ -131,11 +152,101 @@ export default function RelatoriosPage() {
   const savings = calculateSavings()
   const healthBenefits = calculateHealthBenefits()
 
-  // Dados para gráficos (simulados)
-  const moodTrend = [3.2, 3.5, 3.8, 3.6, 4.0, 4.2, 4.1, 4.3, 4.0, 4.4, 4.2, 4.5]
-  const weeklyProgress = [85, 92, 78, 94, 88, 96, 90]
+  // Dados para gráficos melhorados
+  const getMoodTrend = () => {
+    const days = timeAbstinent.days
+    const baseMood = 2.5
+    return Array.from({ length: Math.min(days + 1, 30) }, (_, i) => ({
+      label: `D${i + 1}`,
+      value: Math.min(5, baseMood + (i * 0.1) + (Math.random() * 0.5 - 0.25)),
+      color: "bg-purple-500"
+    }))
+  }
+
+  const getWeeklyProgress = () => {
+    const weeks = Math.ceil(timeAbstinent.days / 7)
+    return Array.from({ length: Math.min(weeks, 12) }, (_, i) => ({
+      label: `S${i + 1}`,
+      value: Math.max(70, 95 - (Math.random() * 15)),
+      color: "bg-blue-500"
+    }))
+  }
+
+  const getActivityDistribution = () => [
+    { label: "SOS Usados", value: Math.floor(timeAbstinent.days * 0.1), color: "bg-red-500" },
+    { label: "Motivações", value: data.motivations?.length || 0, color: "bg-pink-500" },
+    { label: "Check-ins", value: Math.floor(timeAbstinent.days * 0.8), color: "bg-green-500" },
+    { label: "Conquistas", value: Math.floor(timeAbstinent.days / 7), color: "bg-yellow-500" }
+  ]
+
+  const shareReport = async () => {
+    if (!reportRef.current) return
+    
+    try {
+      setShareMessage("📸 Gerando relatório...")
+      
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(reportRef.current, {
+        backgroundColor: '#f8fafc',
+        scale: 2,
+        useCORS: true,
+        allowTaint: false
+      })
+
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+        }, 'image/png', 1.0)
+      })
+
+      if (!blob) throw new Error("Erro ao gerar imagem")
+
+      const file = new File([blob], 'relatorio-purify.png', { type: 'image/png' })
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Meu Relatório de Progresso - Purify',
+          text: `🚀 Confira meu progresso de ${timeAbstinent.days} dias na jornada de purificação!
+
+💰 R$ ${savings.money.toFixed(2)} economizados
+⏰ ${Math.floor(savings.time / 60)}h recuperadas
+🏆 ${healthBenefits.length} benefícios conquistados
+
+#Purify #Progresso #Transformação`,
+          files: [file]
+        })
+        setShareMessage("✅ Relatório compartilhado!")
+      } else {
+        // Fallback para download
+        const link = document.createElement('a')
+        link.download = 'relatorio-purify.png'
+        link.href = canvas.toDataURL('image/png', 1.0)
+        link.click()
+        setShareMessage("📱 Relatório salvo!")
+      }
+    } catch (error) {
+      setShareMessage("⚠️ Erro ao gerar relatório")
+    }
+    
+    setTimeout(() => setShareMessage(null), 3000)
+  }
 
   if (!data.addictionType) return null
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 pb-20">
+        <div className="bg-gradient-to-r from-emerald-500 to-blue-600 p-6 rounded-b-3xl">
+          <SkeletonStats />
+        </div>
+        <div className="p-6 space-y-6">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 pb-20">
@@ -290,47 +401,99 @@ export default function RelatoriosPage() {
 
         {/* Análise de Tendências */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-purple-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
             <LineChart className="text-purple-600" size={24} />
             Análise de Tendências
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Gráfico de Humor Simulado */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-              <h3 className="font-bold text-gray-800 mb-3">Humor ao Longo do Tempo</h3>
-              <div className="h-32 flex items-end justify-between gap-1">
-                {moodTrend.map((mood, index) => (
-                  <div
-                    key={index}
-                    className="bg-purple-400 rounded-t flex-1"
-                    style={{ height: `${(mood / 5) * 100}%` }}
-                    title={`Dia ${index + 1}: ${mood}/5`}
-                  />
-                ))}
-              </div>
-              <div className="text-center mt-2 text-sm text-purple-600">
-                Tendência: {moodTrend[moodTrend.length - 1] > moodTrend[0] ? "📈 Melhorando" : "📊 Estável"}
+            {/* Gráfico de Humor Melhorado */}
+            <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
+              <h3 className="font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                <Heart className="text-purple-600" size={16} />
+                Evolução do Bem-estar
+              </h3>
+              <SimpleChart 
+                data={getMoodTrend()}
+                type="line"
+                height={120}
+                maxValue={5}
+                showValues={false}
+              />
+              <div className="text-center mt-2 text-sm text-purple-600 dark:text-purple-400">
+                {getMoodTrend().length > 1 && (
+                  <span className="flex items-center justify-center gap-1">
+                    {getMoodTrend()[getMoodTrend().length - 1].value > getMoodTrend()[0].value ? (
+                      <>
+                        <ArrowUp size={14} />
+                        Melhorando
+                      </>
+                    ) : (
+                      <>
+                        <Minus size={14} />
+                        Estável
+                      </>
+                    )}
+                  </span>
+                )}
               </div>
             </div>
             
-            {/* Progresso Semanal */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <h3 className="font-bold text-gray-800 mb-3">Sucesso Semanal (%)</h3>
-              <div className="h-32 flex items-end justify-between gap-1">
-                {weeklyProgress.map((progress, index) => (
-                  <div
-                    key={index}
-                    className="bg-blue-400 rounded-t flex-1"
-                    style={{ height: `${progress}%` }}
-                    title={`Semana ${index + 1}: ${progress}%`}
-                  />
-                ))}
-              </div>
-              <div className="text-center mt-2 text-sm text-blue-600">
-                Média: {Math.round(weeklyProgress.reduce((a, b) => a + b) / weeklyProgress.length)}%
+            {/* Progresso Semanal Melhorado */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+              <h3 className="font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                <TrendingUp className="text-blue-600" size={16} />
+                Taxa de Sucesso Semanal
+              </h3>
+              <SimpleChart 
+                data={getWeeklyProgress()}
+                type="bar"
+                height={120}
+                maxValue={100}
+                showValues={false}
+              />
+              <div className="text-center mt-2 text-sm text-blue-600 dark:text-blue-400">
+                {getWeeklyProgress().length > 0 && (
+                  <>
+                    Média: {Math.round(getWeeklyProgress().reduce((sum, item) => sum + item.value, 0) / getWeeklyProgress().length)}%
+                  </>
+                )}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Nova Seção: Distribuição de Atividades */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-indigo-100">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+            <PieChart className="text-indigo-600" size={24} />
+            Distribuição de Atividades
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <SimpleChart 
+                data={getActivityDistribution()}
+                type="progress"
+                maxValue={Math.max(...getActivityDistribution().map(d => d.value)) || 10}
+              />
+            </div>
+            
+            <div className="flex justify-center">
+              <SimplePieChart 
+                data={getActivityDistribution()}
+                size={160}
+                showLabels={true}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800">
+            <p className="text-indigo-700 dark:text-indigo-300 text-sm">
+              <strong>Análise:</strong> Você está usando bem as ferramentas disponíveis! 
+              {data.motivations && data.motivations.length > 5 && " Suas motivações personais são um forte ponto de apoio."}
+              {Math.floor(timeAbstinent.days * 0.1) > 2 && " O uso das ferramentas SOS mostra que você procura ajuda quando precisa."}
+            </p>
           </div>
         </div>
 
@@ -374,18 +537,31 @@ export default function RelatoriosPage() {
         </div>
 
         {/* Botões de Ação */}
-        <div className="bg-gradient-to-r from-emerald-400 to-blue-500 rounded-2xl p-6 text-center shadow-lg">
+        <div ref={reportRef} className="bg-gradient-to-r from-emerald-400 to-blue-500 rounded-2xl p-6 text-center shadow-lg">
           <h3 className="text-white font-bold text-lg mb-4">📊 Compartilhe Seu Progresso</h3>
           <div className="flex gap-3 justify-center">
-            <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all flex items-center gap-2">
+            <button 
+              onClick={shareReport}
+              disabled={shareMessage !== null}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all flex items-center gap-2 disabled:opacity-50"
+            >
               <Download size={16} />
               Baixar Relatório
             </button>
-            <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all flex items-center gap-2">
+            <button 
+              onClick={shareReport}
+              disabled={shareMessage !== null}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl transition-all flex items-center gap-2 disabled:opacity-50"
+            >
               <Share2 size={16} />
               Compartilhar
             </button>
           </div>
+          {shareMessage && (
+            <div className="mt-3 p-2 bg-white/20 rounded-lg">
+              <p className="text-white text-sm font-medium">{shareMessage}</p>
+            </div>
+          )}
           <p className="text-white/80 text-sm mt-3">
             Inspire outros com sua jornada de transformação!
           </p>

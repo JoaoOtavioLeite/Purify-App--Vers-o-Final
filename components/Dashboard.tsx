@@ -5,7 +5,7 @@ import { useAddiction } from "@/contexts/AddictionContext"
 import { MILESTONES, getMilestones } from "@/contexts/AddictionContext"
 import { X, Lightbulb, Menu, Settings, Target, Calendar, TrendingUp, Award, Clock, Timer, Smile, AlertTriangle, Share2 } from "lucide-react"
 import Link from "next/link"
-import html2canvas from "html2canvas"
+// import html2canvas from "html2canvas"
 
 import { getDailyContent } from "@/lib/daily-content"
 
@@ -61,6 +61,7 @@ export function Dashboard() {
         shareButton.disabled = true
         shareButton.textContent = 'Gerando imagem...'
       }
+      const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(detailedRef.current, {
         backgroundColor: '#fff',
         scale: 2,

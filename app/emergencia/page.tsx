@@ -1,44 +1,26 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
 import { 
   Shield, 
-  Wind, 
-  Phone, 
   Heart, 
-  Brain, 
-  Clock, 
-  Lightbulb, 
   Activity,
-  AlertTriangle,
   CheckCircle,
-  Timer,
-  Pause,
-  Play,
-  Zap,
-  BookOpen,
-  ChevronLeft,
-  Quote,
-  Cross,
-  RefreshCw,
   Share2,
-  Trophy,
-  Star,
   Award,
   Flame
 } from "lucide-react"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
+import { BreathingExercise } from "@/components/BreathingExercise"
+import { QuickMindfulness } from "@/components/QuickMindfulness"
 import { useHaptics } from "@/lib/haptics"
 import { useDeviceFeatures } from "@/lib/device-features"
-import html2canvas from "html2canvas"
+// import html2canvas from "html2canvas"
 
 export default function EmergenciaPage() {
   const { data } = useAddiction()
-  const [activeExercise, setActiveExercise] = useState<string | null>(null)
-  const [breathingTimer, setBreathingTimer] = useState(0)
-  const [breathingPhase, setBreathingPhase] = useState<"inhale" | "hold" | "exhale" | "pause">("inhale")
-  const [isBreathing, setIsBreathing] = useState(false)
+  const [activeTab, setActiveTab] = useState<"quick" | "breathing" | "mindfulness" | "support">("quick")
   const [completedActivities, setCompletedActivities] = useState<string[]>([])
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null)
   const [showVictoryModal, setShowVictoryModal] = useState(false)
@@ -54,311 +36,134 @@ export default function EmergenciaPage() {
   const haptics = useHaptics()
   const { share } = useDeviceFeatures()
 
-  // Conteúdo bíblico baseado nas emoções
+  // Conteúdo bíblico simplificado
   const biblicalContent = {
     anxious: {
       emoji: "😰",
       title: "Ansioso",
-      description: "Preocupado, tenso",
-      color: "red",
-      messages: [
-        "Deus conhece suas preocupações e quer te dar paz.",
-        "Entregue suas ansiedades ao Senhor, Ele cuida de você.",
-        "A paz de Cristo pode acalmar seu coração agitado.",
-        "Confie que Deus tem o controle de todas as situações."
-      ],
-      verses: [
-        {
-          text: "Não andeis ansiosos por coisa alguma; antes, em tudo, sejam os vossos pedidos conhecidos diante de Deus, pela oração e pela súplica, com ações de graças.",
-          reference: "Filipenses 4:6"
-        },
-        {
-          text: "Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.",
-          reference: "1 Pedro 5:7"
-        },
-        {
-          text: "Deixo-vos a paz, a minha paz vos dou; não vo-la dou como o mundo a dá. Não se turbe o vosso coração, nem se atemorize.",
-          reference: "João 14:27"
-        }
-      ]
+      subtitle: "Preocupado, tenso",
+      verse: "Não andeis ansiosos por coisa alguma; antes, em tudo, sejam os vossos pedidos conhecidos diante de Deus, pela oração e pela súplica, com ações de graças.",
+      reference: "Filipenses 4:6",
+      message: "Deus conhece suas preocupações e quer te dar paz. Entregue suas ansiedades ao Senhor, Ele cuida de você.",
+      prayer: "Senhor, tomo posse da Sua paz. Entrego a Ti minhas preocupações e confio em Seu cuidado. Amém."
     },
     angry: {
       emoji: "😤",
       title: "Irritado",
-      description: "Com raiva, frustrado",
-      color: "orange",
-      messages: [
-        "Deus entende sua frustração e pode transformar sua raiva em sabedoria.",
-        "O Senhor pode acalmar seu espírito e renovar seu coração.",
-        "Permita que a paciência de Cristo seja sua força.",
-        "Busque a paz que vem do alto para superar a irritação."
-      ],
-      verses: [
-        {
-          text: "Irai-vos e não pequeis; não se ponha o sol sobre a vossa ira.",
-          reference: "Efésios 4:26"
-        },
-        {
-          text: "A resposta branda desvia o furor, mas a palavra dura suscita a ira.",
-          reference: "Provérbios 15:1"
-        },
-        {
-          text: "O homem tardio em irar-se é grande em entendimento, mas o que é de espírito impaciente exalta a loucura.",
-          reference: "Provérbios 14:29"
-        }
-      ]
+      subtitle: "Com raiva, frustrado",
+      verse: "Irai-vos e não pequeis; não se ponha o sol sobre a vossa ira.",
+      reference: "Efésios 4:26",
+      message: "Deus entende sua frustração e pode transformar sua raiva em sabedoria. O Senhor pode acalmar seu espírito.",
+      prayer: "Pai, acalma meu coração. Transforma esta raiva em paciência e sabedoria. Me ajude a perdoar. Amém."
     },
     sad: {
-      emoji: "😢",
+      emoji: "😔",
       title: "Triste",
-      description: "Para baixo, desanimado",
-      color: "blue",
-      messages: [
-        "Jesus conhece sua dor e quer enxugar suas lágrimas.",
-        "Mesmo na tristeza, Deus está preparando alegria para você.",
-        "Sua tristeza não é permanente, a alegria vem pela manhã.",
-        "O Espírito Santo é seu consolador nos momentos difíceis."
-      ],
-      verses: [
-        {
-          text: "Bem-aventurados os que choram, porque eles serão consolados.",
-          reference: "Mateus 5:4"
-        },
-        {
-          text: "O choro pode durar uma noite, mas a alegria vem pela manhã.",
-          reference: "Salmos 30:5"
-        },
-        {
-          text: "Perto está o Senhor dos que têm o coração quebrantado e salva os contritos de espírito.",
-          reference: "Salmos 34:18"
-        }
-      ]
+      subtitle: "Desanimado, melancólico",
+      verse: "Perto está o Senhor dos que têm o coração quebrantado e salva os contritos de espírito.",
+      reference: "Salmos 34:18",
+      message: "Suas lágrimas são preciosas para Deus. Ele está perto de você neste momento de tristeza.",
+      prayer: "Senhor, consola meu coração. Enxuga minhas lágrimas e renova minha esperança em Ti. Amém."
     },
     tired: {
       emoji: "😴",
       title: "Cansado",
-      description: "Sem energia, exausto",
-      color: "yellow",
-      messages: [
-        "Jesus te convida a descansar nEle quando estiver cansado.",
-        "Deus renova as forças daqueles que esperam nEle.",
-        "Sua força vem do Senhor, não das suas próprias capacidades.",
-        "Descanse na presença de Deus e encontre renovação."
-      ],
-      verses: [
-        {
-          text: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei.",
-          reference: "Mateus 11:28"
-        },
-        {
-          text: "Mas os que esperam no Senhor renovarão as suas forças; subirão com asas como águias; correrão e não se cansarão; caminharão e não se fatigarão.",
-          reference: "Isaías 40:31"
-        },
-        {
-          text: "O meu jugo é suave, e o meu fardo é leve.",
-          reference: "Mateus 11:30"
-        }
-      ]
+      subtitle: "Exausto, sem energia",
+      verse: "Vinde a mim, todos os que estais cansados e oprimidos, e eu vos aliviarei.",
+      reference: "Mateus 11:28",
+      message: "Jesus convida você a descansar Nele. Sua força pode renovar suas energias.",
+      prayer: "Jesus, estou cansado. Venho a Ti em busca de descanso e renovação. Fortalece-me. Amém."
     }
   }
 
+  // Atividades rápidas de distração
   const quickActivities = [
-    { 
-      id: "cold-water", 
-      title: "Água Gelada", 
-      description: "Lave o rosto com água gelada por 30 segundos",
-      icon: <Activity className="text-blue-500" size={24} />,
-      duration: "30s"
+    {
+      id: "breathing",
+      title: "Respiração Profunda",
+      description: "5 respirações conscientes",
+      duration: "1 min",
+      icon: <Heart className="text-blue-500" size={20} />
     },
-    { 
-      id: "pushups", 
-      title: "15 Flexões", 
-      description: "Faça exercícios físicos para liberar endorfina",
-      icon: <Heart className="text-red-500" size={24} />,
-      duration: "2min"
+    {
+      id: "walk",
+      title: "Caminhada Rápida",
+      description: "Sair de casa por 10 min",
+      duration: "10 min",
+      icon: <Activity className="text-green-500" size={20} />
     },
-    { 
-      id: "walk", 
-      title: "Caminhada", 
-      description: "Saia para uma caminhada de 10 minutos",
-      icon: <Timer className="text-green-500" size={24} />,
-      duration: "10min"
+    {
+      id: "water",
+      title: "Beber Água",
+      description: "Hidratar e refrescar",
+      duration: "2 min",
+      icon: <Shield className="text-cyan-500" size={20} />
     },
-    { 
-      id: "call-friend", 
-      title: "Ligar para Alguém", 
-      description: "Entre em contato com um amigo ou familiar",
-      icon: <Phone className="text-purple-500" size={24} />,
-      duration: "5min"
-    },
-    { 
-      id: "journal", 
-      title: "Escrever", 
-      description: "Anote seus sentimentos no diário",
-      icon: <Lightbulb className="text-yellow-500" size={24} />,
-      duration: "5min"
-    },
-    { 
-      id: "meditation", 
-      title: "Meditação Rápida", 
-      description: "5 minutos de mindfulness",
-      icon: <Brain className="text-indigo-500" size={24} />,
-      duration: "5min"
-    },
-  ]
-
-  // Breathing exercise timer
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-
-    if (isBreathing) {
-      interval = setInterval(() => {
-        setBreathingTimer(prev => {
-          const newTime = prev + 1
-          
-          // 4-7-8 breathing technique
-          if (breathingPhase === "inhale" && newTime >= 4) {
-            setBreathingPhase("hold")
-            return 0
-          } else if (breathingPhase === "hold" && newTime >= 7) {
-            setBreathingPhase("exhale")
-            return 0
-          } else if (breathingPhase === "exhale" && newTime >= 8) {
-            setBreathingPhase("pause")
-            return 0
-          } else if (breathingPhase === "pause" && newTime >= 2) {
-            setBreathingPhase("inhale")
-            return 0
-          }
-          
-          return newTime
-        })
-      }, 1000)
+    {
+      id: "call",
+      title: "Ligar para Alguém",
+      description: "Conversar com um amigo",
+      duration: "5 min",
+      icon: <Heart className="text-purple-500" size={20} />
     }
-
-    return () => clearInterval(interval)
-  }, [isBreathing, breathingPhase])
+  ]
 
   const handleCompleteActivity = (activityId: string) => {
     if (!completedActivities.includes(activityId)) {
-      setCompletedActivities([...completedActivities, activityId])
+      setCompletedActivities(prev => [...prev, activityId])
+      haptics.success()
     }
   }
 
-  // Função para registrar vitória SOS
   const handleSOSVictory = () => {
-    haptics.success()
-    const newVictoryCount = sosVictories + 1
-    setSosVictories(newVictoryCount)
-    
-    // Salvar no localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('sosVictories', newVictoryCount.toString())
-    }
-    
+    const newCount = sosVictories + 1
+    setSosVictories(newCount)
+    localStorage.setItem('sosVictories', newCount.toString())
     setShowVictoryModal(true)
-    
-    // Fechar modal automaticamente após 5 segundos
-    setTimeout(() => {
-      setShowVictoryModal(false)
-    }, 5000)
+    haptics.success()
   }
 
-  // Função para compartilhar vitória
   const handleShareVictory = async () => {
-    haptics.medium()
-    setIsCapturing(true)
-    setShareMessage("📸 Capturando vitória...")
-
+    if (!victoryCardRef.current) return
+    
     try {
-      if (!victoryCardRef.current) {
-        throw new Error("Elemento não encontrado")
-      }
-
-      const canvas = await html2canvas(victoryCardRef.current, {
-        backgroundColor: '#f8fafc',
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        removeContainer: false,
-        foreignObjectRendering: false,
-        imageTimeout: 0,
-        logging: false,
-        width: victoryCardRef.current.offsetWidth,
-        height: victoryCardRef.current.offsetHeight,
-      })
-
+      setIsCapturing(true)
+      
+      // Importação dinâmica do html2canvas
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(victoryCardRef.current)
       const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob)
-        }, 'image/png', 1.0)
+        canvas.toBlob((blob) => resolve(blob!), 'image/png', 1.0)
       })
-
-      if (!blob) {
-        throw new Error("Erro ao gerar imagem")
-      }
-
-      const file = new File([blob], 'vitoria-sos-purify.png', { type: 'image/png' })
-
-      if (typeof navigator !== 'undefined' && 'share' in navigator && 'canShare' in navigator) {
-        const shareData = {
-          title: 'Vitória SOS - Purify',
-          text: `💪 VITÓRIA! Resisti ao impulso!
-
-🛡️ Usei as técnicas SOS do Purify
-🧠 Respiração 4-7-8 me acalmou
-🏃‍♂️ Atividades saudáveis me distraíram
-🙏 Encontrei força na fé
-
-🔥 Já são ${sosVictories} vitórias registradas!
-Cada resistência me torna mais forte!
-
-#Purify #VitóriaSOS #SuperaçãoDeVícios #FocoNaJornada`,
+      
+      const file = new File([blob], 'sos-victoria.png', { type: 'image/png' })
+      
+      if (share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await share({
+          title: 'SOS Vitória - Purify',
+          text: `🔥 Acabei de resistir a uma tentação! ${sosVictories} vitórias no total! #Purify #Força #Vitória`,
           files: [file]
-        }
-
-        if (navigator.canShare && navigator.canShare(shareData)) {
-          await navigator.share(shareData)
-          setShareMessage("✅ Vitória compartilhada!")
-        } else {
-          downloadVictoryImage(canvas)
-        }
+        })
       } else {
-        downloadVictoryImage(canvas)
+        const link = document.createElement('a')
+        link.download = 'sos-victoria.png'
+        link.href = canvas.toDataURL()
+        link.click()
       }
-
+      
+      setShareMessage("Vitória compartilhada! 🎉")
     } catch (error) {
-      console.error('Erro ao capturar/compartilhar:', error)
-      setShareMessage("⚠️ Erro ao gerar imagem")
+      setShareMessage("Erro ao compartilhar")
     } finally {
       setIsCapturing(false)
-      setTimeout(() => setShareMessage(null), 4000)
-    }
-  }
-
-  const downloadVictoryImage = (canvas: HTMLCanvasElement) => {
-    const link = document.createElement('a')
-    link.download = 'vitoria-sos-purify.png'
-    link.href = canvas.toDataURL('image/png', 1.0)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    setShareMessage("📱 Vitória salva! Compartilhe sua superação!")
-  }
-
-  const getBreathingInstruction = () => {
-    switch (breathingPhase) {
-      case "inhale": return "Inspire profundamente pelo nariz"
-      case "hold": return "Segure a respiração"
-      case "exhale": return "Expire lentamente pela boca"
-      case "pause": return "Pausa..."
+      setTimeout(() => setShareMessage(null), 3000)
     }
   }
 
   if (!data.addictionType) return null
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
       {/* Header de Emergência */}
       <div className="bg-gradient-to-r from-red-500 to-pink-600 pt-14 pb-6 px-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
@@ -388,363 +193,260 @@ Cada resistência me torna mais forte!
       </div>
 
       <div className="px-4 -mt-2 relative z-20 space-y-4">
-        {/* Exercício de Respiração */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-              <Wind className="text-white" size={20} />
-            </div>
-            <div>
-              <h2 className="text-gray-900 font-semibold text-base">Respiração 4-7-8</h2>
-              <p className="text-gray-600 text-sm">Técnica para acalmar a mente</p>
-            </div>
-          </div>
-
-          <div className="text-center mb-6">
-            <div className={`w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center transition-all duration-1000 ${
-              breathingPhase === "inhale" ? "bg-blue-200 scale-110" :
-              breathingPhase === "hold" ? "bg-purple-200 scale-110" :
-              breathingPhase === "exhale" ? "bg-green-200 scale-90" :
-              "bg-gray-200 scale-100"
-            }`}>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-700">{breathingTimer}</div>
-                <div className="text-xs text-gray-600 uppercase tracking-wide">
-                  {breathingPhase === "inhale" ? "Inspire" :
-                   breathingPhase === "hold" ? "Segure" :
-                   breathingPhase === "exhale" ? "Expire" : "Pause"}
-                </div>
-              </div>
-            </div>
-            
-            <p className="text-gray-700 mb-4 font-medium">{getBreathingInstruction()}</p>
-            
-            <button
-              onClick={() => setIsBreathing(!isBreathing)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                isBreathing 
-                  ? "bg-red-500 hover:bg-red-600 text-white" 
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
-            >
-              {isBreathing ? (
-                <>
-                  <Pause className="inline mr-2" size={16} />
-                  Pausar Exercício
-                </>
-              ) : (
-                <>
-                  <Play className="inline mr-2" size={16} />
-                  Começar Respiração
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Atividades Rápidas */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-              <Activity className="text-white" size={20} />
-            </div>
-            <div>
-              <h2 className="text-gray-900 font-semibold text-base">Atividades de Distração</h2>
-              <p className="text-gray-600 text-sm">Escolha uma atividade para desviar o foco:</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3">
-            {quickActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                  completedActivities.includes(activity.id)
-                    ? "bg-green-50 border-green-300"
-                    : "bg-gray-50 border-gray-200 hover:border-blue-300"
+        
+        {/* Navegação por Abas */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-2 shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="grid grid-cols-4 gap-1">
+            {[
+              { key: "quick", label: "SOS", icon: "🚨" },
+              { key: "breathing", label: "Respiração", icon: "🌬️" },
+              { key: "mindfulness", label: "Mindful", icon: "🧘‍♀️" },
+              { key: "support", label: "Apoio", icon: "💙" }
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`p-3 rounded-xl text-center transition-all duration-200 ${
+                  activeTab === tab.key
+                    ? "bg-red-500 text-white shadow-md"
+                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
-                onClick={() => handleCompleteActivity(activity.id)}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  {activity.icon}
-                  {completedActivities.includes(activity.id) && (
-                    <CheckCircle className="text-green-500 ml-auto" size={20} />
-                  )}
-                </div>
-                <h3 className="font-semibold text-gray-800 text-sm mb-1">{activity.title}</h3>
-                <p className="text-gray-600 text-xs mb-2">{activity.description}</p>
-                <span className="text-blue-600 text-xs font-medium">{activity.duration}</span>
-              </div>
+                <div className="text-lg mb-1">{tab.icon}</div>
+                <div className="text-xs font-medium">{tab.label}</div>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Check-in Emocional Cristão */}
-        {!selectedEmotion ? (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
-                <Heart className="text-white" size={20} />
+        {/* Conteúdo Aba: SOS Rápido */}
+        {activeTab === "quick" && (
+          <>
+            {/* Atividades Rápidas */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                  <Activity className="text-white" size={20} />
+                </div>
+                <div>
+                  <h2 className="text-gray-900 dark:text-gray-100 font-semibold text-base">Atividades de Distração</h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">Escolha uma atividade para desviar o foco:</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-gray-900 font-semibold text-base">Como Seu Coração Está Hoje?</h2>
-                <p className="text-gray-600 text-sm">Compartilhe seus sentimentos com Deus e receba Sua Palavra de conforto:</p>
-              </div>
-            </div>
-
-            
-            <div className="grid grid-cols-2 gap-3">
-              <button 
-                onClick={() => setSelectedEmotion('anxious')}
-                className="bg-red-50 border-2 border-red-200 rounded-xl p-4 hover:bg-red-100 transition-all group active:scale-95"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                <div className="text-2xl mb-2">{biblicalContent.anxious.emoji}</div>
-                <h3 className="font-semibold text-gray-800 text-sm">{biblicalContent.anxious.title}</h3>
-                <p className="text-gray-600 text-xs">{biblicalContent.anxious.description}</p>
-              </button>
               
-              <button 
-                onClick={() => setSelectedEmotion('angry')}
-                className="bg-orange-50 border-2 border-orange-200 rounded-xl p-4 hover:bg-orange-100 transition-all group active:scale-95"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                <div className="text-2xl mb-2">{biblicalContent.angry.emoji}</div>
-                <h3 className="font-semibold text-gray-800 text-sm">{biblicalContent.angry.title}</h3>
-                <p className="text-gray-600 text-xs">{biblicalContent.angry.description}</p>
-              </button>
-              
-              <button 
-                onClick={() => setSelectedEmotion('sad')}
-                className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 hover:bg-blue-100 transition-all group active:scale-95"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                <div className="text-2xl mb-2">{biblicalContent.sad.emoji}</div>
-                <h3 className="font-semibold text-gray-800 text-sm">{biblicalContent.sad.title}</h3>
-                <p className="text-gray-600 text-xs">{biblicalContent.sad.description}</p>
-              </button>
-              
-              <button 
-                onClick={() => setSelectedEmotion('tired')}
-                className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 hover:bg-yellow-100 transition-all group active:scale-95"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                <div className="text-2xl mb-2">{biblicalContent.tired.emoji}</div>
-                <h3 className="font-semibold text-gray-800 text-sm">{biblicalContent.tired.title}</h3>
-                <p className="text-gray-600 text-xs">{biblicalContent.tired.description}</p>
-              </button>
-            </div>
-            
-            <div className="mt-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <BookOpen className="text-blue-600" size={18} />
-                <span className="font-medium text-gray-800 text-sm">Palavra de Esperança</span>
-              </div>
-              <p className="text-gray-700 text-sm italic">
-                "Entregue suas preocupações ao Senhor, e ele o sustentará; jamais permitirá que o justo venha a cair." - Salmos 55:22
-              </p>
-            </div>
-          </div>
-        ) : (
-          /* Tela de Conforto Bíblico */
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-purple-200">
-            <div className="flex items-center justify-between mb-6">
-              <button 
-                onClick={() => setSelectedEmotion(null)}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                <ChevronLeft size={20} />
-                <span>Voltar</span>
-              </button>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{biblicalContent[selectedEmotion as keyof typeof biblicalContent].emoji}</span>
-                <span className="font-semibold text-gray-800">
-                  {biblicalContent[selectedEmotion as keyof typeof biblicalContent].title}
-                </span>
-              </div>
-            </div>
-
-            {/* Mensagens de Conforto */}
-            <div className="mb-6">
-              <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <Heart className="text-red-500" size={18} />
-                Mensagens de Esperança
-              </h3>
-              <div className="space-y-3">
-                {biblicalContent[selectedEmotion as keyof typeof biblicalContent].messages.map((message, index) => (
-                  <div key={index} className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-200">
-                    <p className="text-gray-700 text-sm">{message}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {quickActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                      completedActivities.includes(activity.id)
+                        ? "bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600"
+                        : "bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500"
+                    }`}
+                    onClick={() => handleCompleteActivity(activity.id)}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      {activity.icon}
+                      {completedActivities.includes(activity.id) && (
+                        <CheckCircle className="text-green-500 ml-auto" size={20} />
+                      )}
+                    </div>
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm mb-1">{activity.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs mb-2">{activity.description}</p>
+                    <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">{activity.duration}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Versículos Bíblicos */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <BookOpen className="text-purple-600" size={18} />
-                Palavra de Deus para Você
-              </h3>
-              {biblicalContent[selectedEmotion as keyof typeof biblicalContent].verses.map((verse, index) => (
-                <div key={index} className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200 shadow-sm">
-                  <div className="flex items-start gap-3">
-                    <Quote className="text-purple-500 flex-shrink-0 mt-1" size={20} />
-                    <div>
-                      <p className="text-gray-800 font-medium leading-relaxed mb-2 italic">
-                        "{verse.text}"
-                      </p>
-                      <p className="text-purple-600 font-semibold text-sm">
-                        {verse.reference}
-                      </p>
-                    </div>
-                  </div>
+            {/* SOS Vitórias */}
+            <div className="bg-gradient-to-r from-emerald-400 to-green-500 rounded-2xl p-5 text-white shadow-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Award className="text-white" size={20} />
                 </div>
-              ))}
+                <div>
+                  <h2 className="font-semibold text-lg">SOS Vitórias</h2>
+                  <p className="text-white/80 text-sm">Vezes que você resistiu com sucesso</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-1">{sosVictories}</div>
+                  <div className="text-white/80 text-xs">Vitórias</div>
+                </div>
+                
+                <button
+                  onClick={handleSOSVictory}
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white font-semibold py-3 px-6 rounded-xl transition-all flex items-center gap-2"
+                >
+                  <Flame className="text-yellow-300" size={16} />
+                  Resisti!
+                </button>
+              </div>
             </div>
-
-            {/* Oração Sugerida */}
-            <div className="mt-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200">
-              <h4 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                <Cross className="text-orange-500" size={16} />
-                Oração para Este Momento
-              </h4>
-              <p className="text-gray-700 text-sm italic leading-relaxed">
-                "Senhor, venho até Ti com meu coração {biblicalContent[selectedEmotion as keyof typeof biblicalContent].title.toLowerCase()}. 
-                Confio em Tua Palavra e busco Tua paz. Fortalece-me com Teu amor e renova meu espírito. 
-                Em nome de Jesus, amém."
-              </p>
-            </div>
-          </div>
+          </>
         )}
 
-        {/* Mensagem Motivacional */}
-        <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl p-5 text-center">
-          <div className="flex justify-center mb-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <Zap className="text-white" size={20} />
-            </div>
-          </div>
-          <h3 className="text-white font-semibold text-base mb-2">🌟 Você É Mais Forte!</h3>
-          <p className="text-white/90 text-sm leading-relaxed mb-3">
-            Cada momento que você resiste é uma vitória. Seu tempo limpo de{" "}
-            {data.streakStart && (
-              <>
-                {Math.floor((new Date().getTime() - new Date(data.streakStart).getTime()) / (1000 * 60 * 60 * 24))} dias
-              </>
-            )} é a prova de que você consegue.
-          </p>
-          <div className="bg-white/15 rounded-xl p-3">
-            <p className="text-white text-xs font-medium">
-              💡 <strong>Dica:</strong> Este sentimento vai passar. Foque no próximo minuto, não no dia todo.
-            </p>
-          </div>
-        </div>
+        {/* Conteúdo Aba: Respiração */}
+        {activeTab === "breathing" && (
+          <BreathingExercise 
+            technique="4-7-8"
+            onComplete={(cycles) => {
+              haptics.success()
+            }}
+          />
+        )}
 
-        {/* Botão Consegui Resistir! */}
-        <div className="px-4 pb-4">
-          <button
-            onClick={handleSOSVictory}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] native-button-press flex items-center justify-center gap-3"
-          >
-            <Trophy size={24} />
-            <span>💪 Consegui Resistir!</span>
-            <Star size={20} />
-          </button>
-          {sosVictories > 0 && (
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-600 font-medium">
-                🔥 {sosVictories} vitória{sosVictories > 1 ? 's' : ''} registrada{sosVictories > 1 ? 's' : ''}!
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Conteúdo Aba: Mindfulness */}
+        {activeTab === "mindfulness" && (
+          <QuickMindfulness 
+            onComplete={(exerciseId, duration) => {
+              haptics.success()
+            }}
+          />
+        )}
 
-        {/* Modal de Vitória */}
-        {showVictoryModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in px-4">
-            <div 
-              ref={victoryCardRef}
-              className="bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 rounded-3xl p-8 shadow-2xl max-w-sm mx-auto text-center animate-spring-in relative overflow-hidden"
-            >
-              {/* Decorações de fundo */}
-              <div className="absolute top-4 right-4 w-16 h-16 bg-white/20 rounded-full blur-xl"></div>
-              <div className="absolute bottom-4 left-4 w-12 h-12 bg-white/15 rounded-full blur-lg"></div>
-              
-              <div className="relative z-10">
-                {/* Ícone de Vitória */}
-                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                  <Trophy className="text-white" size={40} />
+        {/* Conteúdo Aba: Apoio */}
+        {activeTab === "support" && (
+          <>
+            {/* Check-in Emocional Cristão */}
+            {!selectedEmotion ? (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
+                    <Heart className="text-white" size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-gray-900 dark:text-gray-100 font-semibold text-base">Como você está se sentindo?</h2>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">Escolha sua emoção para receber apoio personalizado</p>
+                  </div>
                 </div>
                 
-                {/* Título */}
-                <h2 className="text-3xl font-extrabold text-white mb-2">
-                  🏆 VITÓRIA!
-                </h2>
-                <p className="text-white/90 text-lg font-semibold mb-4">
-                  Você resistiu ao impulso!
-                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(biblicalContent).map(([emotion, content]) => (
+                    <button
+                      key={emotion}
+                      onClick={() => setSelectedEmotion(emotion)}
+                      className="p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500 bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all text-left"
+                    >
+                      <div className="text-2xl mb-2">{content.emoji}</div>
+                      <div className="font-semibold text-gray-800 dark:text-gray-200 text-sm mb-1">{content.title}</div>
+                      <div className="text-gray-600 dark:text-gray-400 text-xs">{content.subtitle}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+                <button
+                  onClick={() => setSelectedEmotion(null)}
+                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 transition-colors"
+                >
+                  ← Voltar
+                </button>
                 
-                {/* Contador de Vitórias */}
-                <div className="bg-white/20 rounded-2xl p-4 mb-6">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Flame className="text-orange-300" size={24} />
-                    <span className="text-2xl font-bold text-white">{sosVictories}</span>
-                    <Award className="text-yellow-300" size={24} />
-                  </div>
-                  <p className="text-white/80 text-sm">
-                    Vitória{sosVictories > 1 ? 's' : ''} SOS registrada{sosVictories > 1 ? 's' : ''}!
+                <div className="text-center mb-6">
+                  <div className="text-6xl mb-3">{biblicalContent[selectedEmotion].emoji}</div>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+                    {biblicalContent[selectedEmotion].title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {biblicalContent[selectedEmotion].subtitle}
                   </p>
                 </div>
                 
-                {/* Mensagem Motivacional */}
-                <p className="text-white/90 text-sm leading-relaxed mb-6">
-                  🧠 <strong>Sua mente ficou mais forte!</strong><br/>
-                  Cada resistência reconstrói seus circuitos neurais.<br/>
-                  🔥 <strong>Você está se transformando!</strong>
-                </p>
-                
-                {/* Botões */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowVictoryModal(false)}
-                    className="flex-1 bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-4 rounded-xl transition-all native-button-press"
-                  >
-                    ✨ Continuar
-                  </button>
-                  <button
-                    onClick={handleShareVictory}
-                    disabled={isCapturing}
-                    className="flex-1 bg-white/90 hover:bg-white text-emerald-600 font-semibold py-3 px-4 rounded-xl transition-all native-button-press flex items-center justify-center gap-2"
-                  >
-                    {isCapturing ? (
-                      <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <>
-                        <Share2 size={16} />
-                        <span>Compartilhar</span>
-                      </>
-                    )}
-                  </button>
+                <div className="space-y-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                    <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">📖 Versículo de Força</h4>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm italic leading-relaxed">
+                      "{biblicalContent[selectedEmotion].verse}"
+                    </p>
+                    <p className="text-blue-600 dark:text-blue-400 text-xs mt-2 font-medium">
+                      {biblicalContent[selectedEmotion].reference}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">💚 Mensagem de Esperança</h4>
+                    <p className="text-green-700 dark:text-green-300 text-sm leading-relaxed">
+                      {biblicalContent[selectedEmotion].message}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+                    <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">🙏 Oração Simples</h4>
+                    <p className="text-purple-700 dark:text-purple-300 text-sm leading-relaxed italic">
+                      {biblicalContent[selectedEmotion].prayer}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Toast de feedback */}
-        {shareMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 max-w-sm mx-auto animate-spring-in">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="text-green-600" size={16} />
-                </div>
-                <p className="text-gray-800 font-medium text-sm">{shareMessage}</p>
-              </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* Modal de Vitória SOS */}
+      {showVictoryModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-gradient-to-br from-emerald-400 to-green-500 rounded-3xl shadow-2xl max-w-sm w-full border border-white/20">
+            <div ref={victoryCardRef} className="p-6 text-white text-center">
+              <div className="text-6xl mb-4">🔥</div>
+              <h3 className="text-2xl font-bold mb-2">Vitória SOS!</h3>
+              <p className="text-white/90 mb-4">
+                Você resistiu com sucesso! Esta é sua vitória número <strong>{sosVictories}</strong>!
+              </p>
+              
+              {/* Mensagem Motivacional */}
+              <p className="text-white/90 text-sm leading-relaxed mb-6">
+                🧠 <strong>Sua mente ficou mais forte!</strong><br/>
+                Cada resistência reconstrói seus circuitos neurais.<br/>
+                🔥 <strong>Você está se transformando!</strong>
+              </p>
+              
+              {/* Botões */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowVictoryModal(false)}
+                  className="flex-1 bg-white/20 hover:bg-white/30 text-white font-semibold py-3 px-4 rounded-xl transition-all"
+                >
+                  ✨ Continuar
+                </button>
+                <button
+                  onClick={handleShareVictory}
+                  disabled={isCapturing}
+                  className="flex-1 bg-white/90 hover:bg-white text-emerald-600 font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+                >
+                  {isCapturing ? (
+                    <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <Share2 size={16} />
+                      <span>Compartilhar</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast de feedback */}
+      {shareMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 max-w-sm mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <CheckCircle className="text-green-600 dark:text-green-400" size={16} />
+              </div>
+              <p className="text-gray-800 dark:text-gray-200 font-medium text-sm">{shareMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNavigation />
     </div>

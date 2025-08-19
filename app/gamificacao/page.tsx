@@ -25,7 +25,7 @@ import {
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
 import { useHaptics } from "@/lib/haptics"
 import { useDeviceFeatures } from "@/lib/device-features"
-import html2canvas from "html2canvas"
+// import html2canvas from "html2canvas"
 
 interface Achievement {
   id: string
@@ -257,6 +257,7 @@ export default function GamificacaoPage() {
         throw new Error("Elemento não encontrado")
       }
 
+      const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(achievementsCardRef.current, {
         backgroundColor: '#f8fafc',
         scale: 2,
