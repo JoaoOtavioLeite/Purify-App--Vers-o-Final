@@ -385,7 +385,7 @@ export default function BemEstarPage() {
     const nextCheckin = getNextCheckinTime()
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden">
         {/* Elementos decorativos de fundo */}
         <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-green-200/30 to-emerald-200/30 rounded-full blur-3xl -translate-x-36 -translate-y-36"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-teal-200/30 to-cyan-200/30 rounded-full blur-3xl translate-x-48 translate-y-48"></div>
@@ -393,10 +393,10 @@ export default function BemEstarPage() {
         <div className="flex-1 flex flex-col min-h-screen">
           {/* Header de Sucesso */}
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 relative flex-shrink-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 glass-card/10 rounded-full -translate-y-16 translate-x-16"></div>
             
             <div className="relative z-10 text-center">
-              <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <div className="glass-card/20 p-4 rounded-2xl backdrop-blur-sm w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                 <CheckCircle className="text-white" size={40} />
               </div>
               <h1 className="text-2xl font-bold mb-2">Check-in Concluído! ✅</h1>
@@ -406,11 +406,11 @@ export default function BemEstarPage() {
 
           {/* Conteúdo Principal */}
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 max-w-md w-full border border-white/50">
+            <div className="glass-card/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 max-w-md w-full border border-white/50">
               <div className="text-center mb-6">
                 <div className="text-6xl mb-4">🎉</div>
-                <h2 className="text-xl font-bold text-gray-800 mb-2">Missão Cumprida!</h2>
-                <p className="text-gray-600">Seu check-in diário foi registrado com sucesso.</p>
+                <h2 className="text-xl font-bold text-white mb-2">Missão Cumprida!</h2>
+                <p className="text-white/80">Seu check-in diário foi registrado com sucesso.</p>
               </div>
 
               {/* Informações do Próximo Check-in */}
@@ -445,8 +445,8 @@ export default function BemEstarPage() {
 
               {/* Motivação */}
               <div className="text-center">
-                <h3 className="font-semibold text-gray-800 mb-2">Continue Firme! 💪</h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <h3 className="font-semibold text-white mb-2">Continue Firme! 💪</h3>
+                <p className="text-white/80 text-sm mb-4">
                   Cada check-in é um passo importante na sua jornada de crescimento pessoal.
                 </p>
                 
@@ -464,7 +464,7 @@ export default function BemEstarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden">
       {/* Elementos decorativos de fundo */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-3xl -translate-x-36 -translate-y-36"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-pink-200/30 to-orange-200/30 rounded-full blur-3xl translate-x-48 translate-y-48"></div>
@@ -495,12 +495,12 @@ export default function BemEstarPage() {
       <div className="flex-1 flex flex-col">
         {/* Header da Pergunta */}
         <div className={`bg-gradient-to-r ${currentQ?.color} text-white p-6 relative flex-shrink-0`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 glass-card/10 rounded-full -translate-y-16 translate-x-16"></div>
           
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                <div className="glass-card/20 p-3 rounded-xl backdrop-blur-sm">
                   <span className="text-2xl">{currentQ?.emoji}</span>
                 </div>
                 <div>
@@ -515,7 +515,7 @@ export default function BemEstarPage() {
             </div>
 
             {/* Card de Progresso */}
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
+            <div className="glass-card/20 backdrop-blur-sm rounded-2xl p-4 border border-white/30">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="text-white" size={20} />
@@ -527,7 +527,7 @@ export default function BemEstarPage() {
                 </div>
               </div>
               
-              <div className="w-full bg-white/20 rounded-full h-2 mb-2">
+              <div className="w-full glass-card/20 rounded-full h-2 mb-2">
                 <div 
                   className="bg-gradient-to-r from-yellow-300 to-green-300 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${(dailyAnswers.length / dailyQuestions.length) * 100}%` }}
@@ -547,15 +547,15 @@ export default function BemEstarPage() {
 
 
         {/* Navegação */}
-        <div className="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0">
+        <div className="glass-card border-t border-white/20 px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between max-w-md mx-auto">
             <button
               onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
               disabled={currentQuestion === 0}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 currentQuestion === 0
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 active:scale-95"
+                  ? "bg-white/20 text-white/40 cursor-not-allowed"
+                  : "bg-white/20 text-white/90 hover:bg-white/30 active:scale-95"
               }`}
             >
               ← Anterior
@@ -571,7 +571,7 @@ export default function BemEstarPage() {
                       ? "bg-indigo-500 scale-125 shadow-lg" 
                       : completedQuestions.has(index)
                       ? "bg-green-400 scale-110" 
-                      : "bg-gray-300 hover:bg-gray-400"
+                      : "bg-white/30 hover:bg-white/40"
                   }`}
                 />
               ))}
@@ -583,7 +583,7 @@ export default function BemEstarPage() {
                 disabled={getDailyAnswer(currentQ?.id) === undefined}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   getDailyAnswer(currentQ?.id) === undefined
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    ? "bg-white/20 text-white/40 cursor-not-allowed"
                     : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 active:scale-95 shadow-md"
                 }`}
               >
@@ -599,7 +599,7 @@ export default function BemEstarPage() {
                 disabled={dailyAnswers.length < dailyQuestions.length}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   dailyAnswers.length < dailyQuestions.length
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    ? "bg-white/20 text-white/40 cursor-not-allowed"
                     : "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 active:scale-95 shadow-md"
                 }`}
               >
@@ -611,25 +611,25 @@ export default function BemEstarPage() {
 
         {/* Instruções da Pergunta */}
         {currentQ?.type === "scale" && (
-          <div className="bg-white border-t border-b border-gray-200 px-4 py-4">
+          <div className="glass-card border-t border-b border-white/20 px-4 py-4">
             <div className="text-center max-w-md mx-auto">
-              <div className="text-gray-800 text-lg font-semibold mb-1">Avalie de 1 a 5</div>
-              <div className="text-sm text-gray-600">1 = Muito baixo | 5 = Muito alto</div>
+              <div className="text-white text-lg font-semibold mb-1">Avalie de 1 a 5</div>
+              <div className="text-sm text-white/80">1 = Muito baixo | 5 = Muito alto</div>
             </div>
           </div>
         )}
 
         {currentQ?.type === "emoji" && (
-          <div className="bg-white border-t border-b border-gray-200 px-4 py-4">
+          <div className="glass-card border-t border-b border-white/20 px-4 py-4">
             <div className="text-center max-w-md mx-auto">
-              <div className="text-gray-800 text-lg font-semibold mb-1">Como você está se sentindo?</div>
-              <div className="text-sm text-gray-600">Escolha o emoji que melhor te representa</div>
+              <div className="text-white text-lg font-semibold mb-1">Como você está se sentindo?</div>
+              <div className="text-sm text-white/80">Escolha o emoji que melhor te representa</div>
             </div>
           </div>
         )}
 
         {/* Área de Resposta */}
-        <div className="flex-1 bg-gray-50 px-4 py-4 min-h-0">
+        <div className="flex-1 px-4 py-4 min-h-0">
           {currentQ?.type === "boolean" && (
             <div className="w-full max-w-md mx-auto h-full flex items-center">
               <div className="grid grid-cols-2 gap-4 w-full">
@@ -638,7 +638,7 @@ export default function BemEstarPage() {
                   className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 transform active:scale-95 ${
                     getDailyAnswer(currentQ.id) === true
                       ? "bg-gradient-to-br from-green-400 to-emerald-500 border-green-400 text-white shadow-xl scale-105"
-                      : "bg-white border-gray-200 hover:border-green-300 hover:shadow-lg"
+                      : "glass-card border-white/20 hover:border-green-300 hover:shadow-lg"
                   }`}
                 >
                   <div className="text-center">
@@ -648,12 +648,12 @@ export default function BemEstarPage() {
                       ✅
                     </div>
                     <div className={`font-bold text-xl mb-2 ${
-                      getDailyAnswer(currentQ.id) === true ? "text-white" : "text-gray-700"
+                      getDailyAnswer(currentQ.id) === true ? "text-white" : "text-white/90"
                     }`}>
                       Sim!
                     </div>
                     <div className={`text-sm ${
-                      getDailyAnswer(currentQ.id) === true ? "text-white/90" : "text-gray-500"
+                      getDailyAnswer(currentQ.id) === true ? "text-white/90" : "text-white/60"
                     }`}>
                       Consegui fazer
                     </div>
@@ -670,7 +670,7 @@ export default function BemEstarPage() {
                   className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 transform active:scale-95 ${
                     getDailyAnswer(currentQ.id) === false
                       ? "bg-gradient-to-br from-red-400 to-pink-500 border-red-400 text-white shadow-xl scale-105"
-                      : "bg-white border-gray-200 hover:border-red-300 hover:shadow-lg"
+                      : "glass-card border-white/20 hover:border-red-300 hover:shadow-lg"
                   }`}
                 >
                   <div className="text-center">
@@ -680,12 +680,12 @@ export default function BemEstarPage() {
                       ❌
                     </div>
                     <div className={`font-bold text-xl mb-2 ${
-                      getDailyAnswer(currentQ.id) === false ? "text-white" : "text-gray-700"
+                      getDailyAnswer(currentQ.id) === false ? "text-white" : "text-white/90"
                     }`}>
                       Não
                     </div>
                     <div className={`text-sm ${
-                      getDailyAnswer(currentQ.id) === false ? "text-white/90" : "text-gray-500"
+                      getDailyAnswer(currentQ.id) === false ? "text-white/90" : "text-white/60"
                     }`}>
                       Não consegui
                     </div>
@@ -712,7 +712,7 @@ export default function BemEstarPage() {
                         ? level <= 2 ? "bg-gradient-to-br from-red-400 to-red-500 border-red-400 text-white shadow-xl scale-105" :
                           level <= 3 ? "bg-gradient-to-br from-yellow-400 to-yellow-500 border-yellow-400 text-white shadow-xl scale-105" :
                           "bg-gradient-to-br from-green-400 to-green-500 border-green-400 text-white shadow-xl scale-105"
-                        : "bg-white border-gray-200 hover:shadow-lg"
+                        : "glass-card border-white/20 hover:shadow-lg"
                     }`}
                   >
                     <div className="text-center">
@@ -726,7 +726,7 @@ export default function BemEstarPage() {
                         {level}
                       </div>
                       <div className={`text-xs font-medium ${
-                        getDailyAnswer(currentQ.id) === level ? "text-white" : "text-gray-600"
+                        getDailyAnswer(currentQ.id) === level ? "text-white" : "text-white/80"
                       }`}>
                         {level === 1 ? "Muito baixo" :
                          level === 2 ? "Baixo" :
@@ -736,7 +736,7 @@ export default function BemEstarPage() {
                     </div>
                     {getDailyAnswer(currentQ.id) === level && (
                       <div className="absolute -top-1 -right-1">
-                        <div className="bg-white rounded-full p-1">
+                        <div className="glass-card rounded-full p-1">
                           <CheckCircle className="text-green-500" size={18} />
                         </div>
                       </div>
@@ -757,7 +757,7 @@ export default function BemEstarPage() {
                     className={`group relative p-4 rounded-2xl border-2 transition-all duration-300 transform active:scale-95 aspect-square flex flex-col items-center justify-center ${
                       getDailyAnswer(currentQ.id) === option.value
                         ? "bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-400 text-white shadow-xl scale-105"
-                        : "bg-white border-gray-200 hover:shadow-lg hover:border-indigo-300"
+                        : "glass-card border-white/20 hover:shadow-lg hover:border-indigo-300"
                     }`}
                   >
                     <div className="text-center">
@@ -767,14 +767,14 @@ export default function BemEstarPage() {
                         {option.emoji}
                       </div>
                       <div className={`text-xs font-medium leading-tight ${
-                        getDailyAnswer(currentQ.id) === option.value ? "text-white" : "text-gray-600"
+                        getDailyAnswer(currentQ.id) === option.value ? "text-white" : "text-white/80"
                       }`}>
                         {option.label}
                       </div>
                     </div>
                     {getDailyAnswer(currentQ.id) === option.value && (
                       <div className="absolute -top-1 -right-1">
-                        <div className="bg-white rounded-full p-1">
+                        <div className="glass-card rounded-full p-1">
                           <CheckCircle className="text-indigo-500" size={14} />
                         </div>
                       </div>
@@ -791,7 +791,7 @@ export default function BemEstarPage() {
       {/* Modal do Relatório Premium */}
       {showReport && dailyReport && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
-          <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-sm w-full max-h-[80vh] overflow-y-auto border border-white/50 my-4">
+          <div className="glass-card/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-sm w-full max-h-[80vh] overflow-y-auto border border-white/50 my-4">
             {/* Header do Relatório */}
             <div className={`bg-gradient-to-r ${
               dailyReport.mood === "excellent" ? "from-green-400 to-emerald-500" :
@@ -809,7 +809,7 @@ export default function BemEstarPage() {
                       setShowReport(false)
                       saveCheckinCompletion()
                     }}
-                    className="bg-white/20 hover:bg-white/30 p-2 rounded-xl transition-colors backdrop-blur-sm"
+                    className="glass-card/20 hover:glass-card/30 p-2 rounded-xl transition-colors backdrop-blur-sm"
                   >
                     ✕
                   </button>
@@ -845,7 +845,7 @@ export default function BemEstarPage() {
                   </h4>
                   <div className="space-y-2">
                     {dailyReport.achievements.map((achievement, index) => (
-                      <div key={index} className="bg-white/60 p-3 rounded-xl border border-yellow-200">
+                      <div key={index} className="glass-card/60 p-3 rounded-xl border border-yellow-200">
                         <div className="text-yellow-800 font-medium">{achievement}</div>
                       </div>
                     ))}
@@ -864,18 +864,18 @@ export default function BemEstarPage() {
                   }
                   
                   return (
-                    <div key={category} className="bg-gradient-to-br from-white to-gray-50 p-4 rounded-2xl border border-gray-200 text-center">
+                    <div key={category} className="bg-gradient-to-br from-white/10 to-white/5 p-4 rounded-2xl border border-white/20 text-center">
                       <div className="mb-2">
                         {category === "physical" && <Activity className="mx-auto text-orange-500" size={24} />}
                         {category === "mental" && <Brain className="mx-auto text-purple-500" size={24} />}
                         {category === "spiritual" && <Sparkles className="mx-auto text-yellow-500" size={24} />}
                         {category === "social" && <Users className="mx-auto text-blue-500" size={24} />}
                       </div>
-                      <div className="text-xs font-medium text-gray-600 mb-1">{categoryNames[category as keyof typeof categoryNames]}</div>
-                      <div className="text-2xl font-bold text-gray-800">
+                      <div className="text-xs font-medium text-white/80 mb-1">{categoryNames[category as keyof typeof categoryNames]}</div>
+                      <div className="text-2xl font-bold text-white">
                         {score.toFixed(1)}
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                      <div className="w-full bg-white/20 rounded-full h-2 mt-2">
                         <div 
                           className={`h-2 rounded-full ${
                             category === "physical" ? "bg-orange-500" :
@@ -899,7 +899,7 @@ export default function BemEstarPage() {
                   </h4>
                   <div className="space-y-2">
                     {dailyReport.nextGoals.map((goal, index) => (
-                      <div key={index} className="flex items-center gap-3 bg-white/60 p-3 rounded-xl border border-blue-200">
+                      <div key={index} className="flex items-center gap-3 glass-card/60 p-3 rounded-xl border border-blue-200">
                         <div className="w-6 h-6 rounded-full border-2 border-blue-400"></div>
                         <div className="text-blue-800 text-sm">{goal}</div>
                       </div>
@@ -910,7 +910,7 @@ export default function BemEstarPage() {
 
               {/* Recomendações */}
               <div className="space-y-3">
-                <h4 className="font-bold text-gray-800 flex items-center gap-2">
+                <h4 className="font-bold text-white flex items-center gap-2">
                   <Gift className="text-purple-500" size={20} />
                   Mensagens Especiais
                 </h4>

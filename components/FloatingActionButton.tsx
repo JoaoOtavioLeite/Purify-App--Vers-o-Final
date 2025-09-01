@@ -18,29 +18,29 @@ const fabActions: FABAction[] = [
     icon: <Shield size={20} />,
     label: "SOS",
     href: "/emergencia",
-    color: "text-red-600",
-    bgColor: "bg-red-100 hover:bg-red-200"
+    color: "text-red-400",
+    bgColor: "bg-red-500/20 hover:bg-red-500/30"
   },
   {
     icon: <Heart size={20} />,
     label: "Motivação",
     href: "/motivacao",
-    color: "text-pink-600",
-    bgColor: "bg-pink-100 hover:bg-pink-200"
+    color: "text-pink-400",
+    bgColor: "bg-pink-500/20 hover:bg-pink-500/30"
   },
   {
     icon: <Trophy size={20} />,
     label: "Conquistas",
     href: "/gamificacao",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100 hover:bg-yellow-200"
+    color: "text-yellow-400",
+    bgColor: "bg-yellow-500/20 hover:bg-yellow-500/30"
   },
   {
     icon: <Sparkles size={20} />,
     label: "Bem-estar",
     href: "/bem-estar",
-    color: "text-purple-600",
-    bgColor: "bg-purple-100 hover:bg-purple-200"
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/20 hover:bg-purple-500/30"
   }
 ]
 
@@ -87,7 +87,7 @@ export function FloatingActionButton() {
             }}
           >
             {/* Label */}
-            <span className="bg-white px-3 py-2 rounded-lg shadow-lg text-sm font-medium text-gray-700 whitespace-nowrap">
+            <span className="bg-gray-800/90 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-sm font-medium text-white whitespace-nowrap">
               {action.label}
             </span>
             

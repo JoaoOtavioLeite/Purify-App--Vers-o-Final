@@ -163,7 +163,7 @@ export default function EmergenciaPage() {
   if (!data.addictionType) return null
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 pb-12">
       {/* Header de Emergência */}
       <div className="bg-gradient-to-r from-red-500 to-pink-600 pt-14 pb-6 px-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
@@ -195,7 +195,7 @@ export default function EmergenciaPage() {
       <div className="px-4 -mt-2 relative z-20 space-y-4">
         
         {/* Navegação por Abas */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-2 shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="glass-card rounded-2xl p-2 shadow-sm">
           <div className="grid grid-cols-4 gap-1">
             {[
               { key: "quick", label: "SOS", icon: "🚨" },
@@ -209,7 +209,7 @@ export default function EmergenciaPage() {
                 className={`p-3 rounded-xl text-center transition-all duration-200 ${
                   activeTab === tab.key
                     ? "bg-red-500 text-white shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    : "text-white/70 hover:bg-white/10"
                 }`}
               >
                 <div className="text-lg mb-1">{tab.icon}</div>
@@ -223,14 +223,14 @@ export default function EmergenciaPage() {
         {activeTab === "quick" && (
           <>
             {/* Atividades Rápidas */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="glass-card rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
                   <Activity className="text-white" size={20} />
                 </div>
                 <div>
-                  <h2 className="text-gray-900 dark:text-gray-100 font-semibold text-base">Atividades de Distração</h2>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">Escolha uma atividade para desviar o foco:</p>
+                  <h2 className="text-white font-semibold text-base">Atividades de Distração</h2>
+                  <p className="text-white/80 text-sm">Escolha uma atividade para desviar o foco:</p>
                 </div>
               </div>
               
@@ -240,8 +240,8 @@ export default function EmergenciaPage() {
                     key={activity.id}
                     className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
                       completedActivities.includes(activity.id)
-                        ? "bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600"
-                        : "bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500"
+                        ? "bg-green-500/20 border-green-400"
+                        : "bg-white/5 border-white/20 hover:border-blue-400 hover:bg-white/10"
                     }`}
                     onClick={() => handleCompleteActivity(activity.id)}
                   >
@@ -251,9 +251,9 @@ export default function EmergenciaPage() {
                         <CheckCircle className="text-green-500 ml-auto" size={20} />
                       )}
                     </div>
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm mb-1">{activity.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-xs mb-2">{activity.description}</p>
-                    <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">{activity.duration}</span>
+                    <h3 className="font-semibold text-white text-sm mb-1">{activity.title}</h3>
+                    <p className="text-white/70 text-xs mb-2">{activity.description}</p>
+                    <span className="text-blue-400 text-xs font-medium">{activity.duration}</span>
                   </div>
                 ))}
               </div>
@@ -313,14 +313,14 @@ export default function EmergenciaPage() {
           <>
             {/* Check-in Emocional Cristão */}
             {!selectedEmotion ? (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="glass-card rounded-2xl p-5 shadow-sm ">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
                     <Heart className="text-white" size={20} />
                   </div>
                   <div>
-                    <h2 className="text-gray-900 dark:text-gray-100 font-semibold text-base">Como você está se sentindo?</h2>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Escolha sua emoção para receber apoio personalizado</p>
+                    <h2 className="text-white font-semibold text-base">Como você está se sentindo?</h2>
+                    <p className="text-white/70 text-sm">Escolha sua emoção para receber apoio personalizado</p>
                   </div>
                 </div>
                 
@@ -329,20 +329,20 @@ export default function EmergenciaPage() {
                     <button
                       key={emotion}
                       onClick={() => setSelectedEmotion(emotion)}
-                      className="p-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-500 bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all text-left"
+                      className="p-4 rounded-xl border-2 border-white/20 hover:border-purple-300/60 bg-white/10 backdrop-blur-sm hover:bg-purple-500/20 transition-all text-left hover:scale-105 active:scale-95"
                     >
                       <div className="text-2xl mb-2">{content.emoji}</div>
-                      <div className="font-semibold text-gray-800 dark:text-gray-200 text-sm mb-1">{content.title}</div>
-                      <div className="text-gray-600 dark:text-gray-400 text-xs">{content.subtitle}</div>
+                      <div className="font-semibold text-white text-sm mb-1">{content.title}</div>
+                      <div className="text-white/70 text-xs">{content.subtitle}</div>
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="glass-card rounded-2xl p-5 shadow-sm ">
                 <button
                   onClick={() => setSelectedEmotion(null)}
-                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 mb-4 transition-colors"
+                  className="flex items-center gap-2 text-white/70 hover:text-gray-800 dark:hover:text-gray-200 mb-4 transition-colors"
                 >
                   ← Voltar
                 </button>
@@ -352,32 +352,32 @@ export default function EmergenciaPage() {
                   <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                     {biblicalContent[selectedEmotion].title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-white/70">
                     {biblicalContent[selectedEmotion].subtitle}
                   </p>
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                    <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">📖 Versículo de Força</h4>
-                    <p className="text-blue-700 dark:text-blue-300 text-sm italic leading-relaxed">
+                  <div className="bg-blue-500/20 backdrop-blur-sm rounded-xl p-4 border border-blue-400/30">
+                    <h4 className="font-semibold text-blue-200 mb-2">📖 Versículo de Força</h4>
+                    <p className="text-blue-100 text-sm italic leading-relaxed">
                       "{biblicalContent[selectedEmotion].verse}"
                     </p>
-                    <p className="text-blue-600 dark:text-blue-400 text-xs mt-2 font-medium">
+                    <p className="text-blue-200/80 text-xs mt-2 font-medium">
                       {biblicalContent[selectedEmotion].reference}
                     </p>
                   </div>
                   
-                  <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
-                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">💚 Mensagem de Esperança</h4>
-                    <p className="text-green-700 dark:text-green-300 text-sm leading-relaxed">
+                  <div className="bg-green-500/20 backdrop-blur-sm rounded-xl p-4 border border-green-400/30">
+                    <h4 className="font-semibold text-green-200 mb-2">💚 Mensagem de Esperança</h4>
+                    <p className="text-green-100 text-sm leading-relaxed">
                       {biblicalContent[selectedEmotion].message}
                     </p>
                   </div>
                   
-                  <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
-                    <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">🙏 Oração Simples</h4>
-                    <p className="text-purple-700 dark:text-purple-300 text-sm leading-relaxed italic">
+                  <div className="bg-purple-500/20 backdrop-blur-sm rounded-xl p-4 border border-purple-400/30">
+                    <h4 className="font-semibold text-purple-200 mb-2">🙏 Oração Simples</h4>
+                    <p className="text-purple-100 text-sm leading-relaxed italic">
                       {biblicalContent[selectedEmotion].prayer}
                     </p>
                   </div>
@@ -437,7 +437,7 @@ export default function EmergenciaPage() {
       {/* Toast de feedback */}
       {shareMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 max-w-sm mx-auto">
+          <div className="glass-card rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 max-w-sm mx-auto">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                 <CheckCircle className="text-green-600 dark:text-green-400" size={16} />

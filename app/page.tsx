@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAddiction } from "@/contexts/AddictionContext"
+
 import { 
   X, 
   Lightbulb, 
@@ -28,6 +29,7 @@ import { OnboardingFlow } from "@/components/OnboardingFlow"
 import { Dashboard } from "@/components/Dashboard"
 import { BottomNavigation } from "@/components/ui/BottomNavigation"
 
+
 import { getDailyContent } from "@/lib/daily-content"
 
 export default function HomePage() {
@@ -47,15 +49,15 @@ export default function HomePage() {
     return () => clearInterval(timer)
   }, [])
 
-  if (!data.isOnboarded || !data.addictionType) {
+  if (!data.isOnboarded) {
     return <OnboardingFlow />
   }
 
   const getGreeting = () => {
     const hour = currentTime.getHours()
-    if (hour < 12) return { text: "Bom dia", icon: <Sun className="text-yellow-500" size={24} />, color: "from-yellow-400 to-orange-500" }
-    if (hour < 18) return { text: "Boa tarde", icon: <Sun className="text-orange-500" size={24} />, color: "from-orange-400 to-red-500" }
-    return { text: "Boa noite", icon: <Moon className="text-indigo-500" size={24} />, color: "from-indigo-400 to-purple-500" }
+    if (hour < 12) return { text: "Bom dia", icon: <Sun className="text-blue-400" size={24} />, color: "from-blue-500/80 to-purple-600/80" }
+    if (hour < 18) return { text: "Boa tarde", icon: <Sun className="text-purple-400" size={24} />, color: "from-purple-500/80 to-indigo-600/80" }
+    return { text: "Boa noite", icon: <Moon className="text-indigo-400" size={24} />, color: "from-indigo-500/80 to-purple-600/80" }
   }
 
   const greeting = getGreeting()
@@ -66,7 +68,7 @@ export default function HomePage() {
       description: "Precisa de ajuda agora?",
       icon: <Shield className="text-white" size={24} />,
       href: "/emergencia",
-      gradient: "from-red-500 to-pink-600",
+      gradient: "from-red-400/80 to-pink-500/80",
       shadowColor: "shadow-red-300/50",
       urgent: true,
       emoji: "🚨"
@@ -76,7 +78,7 @@ export default function HomePage() {
       description: "Inspiração diária",
       icon: <Heart className="text-white" size={24} />,
       href: "/motivacao", 
-      gradient: "from-pink-500 to-rose-600",
+      gradient: "from-pink-400/80 to-rose-500/80",
       shadowColor: "shadow-pink-300/50",
       emoji: "💝"
     },
@@ -85,7 +87,7 @@ export default function HomePage() {
       description: "Seus troféus",
       icon: <Trophy className="text-white" size={24} />,
       href: "/gamificacao",
-      gradient: "from-yellow-500 to-orange-600",
+      gradient: "from-yellow-400/80 to-orange-500/80",
       shadowColor: "shadow-yellow-300/50",
       emoji: "🏆"
     },
@@ -94,7 +96,7 @@ export default function HomePage() {
       description: "Como você está?",
       icon: <Sparkles className="text-white" size={24} />,
       href: "/bem-estar",
-      gradient: "from-purple-500 to-indigo-600",
+      gradient: "from-purple-400/80 to-indigo-500/80",
       shadowColor: "shadow-purple-300/50",
       emoji: "✨"
     }
@@ -127,7 +129,7 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen pb-24 bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 pb-12">
       {/* Header Moderno */}
       <div className={`bg-gradient-to-r ${greeting.color} pt-14 pb-6 px-4 relative overflow-hidden`}>
         {/* Elementos decorativos minimalistas */}
@@ -144,10 +146,12 @@ export default function HomePage() {
               </div>
               <p className="text-white/80 text-sm">Você está indo muito bem</p>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 text-center">
-              <div className="text-2xl font-bold text-white">{data.addictionType.icon}</div>
-              <div className="text-white/90 text-xs font-medium">{data.addictionType.name}</div>
-            </div>
+            {data.addictionType && (
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 text-center">
+                <div className="text-2xl font-bold text-white">{data.addictionType.icon}</div>
+                <div className="text-white/90 text-xs font-medium">{data.addictionType.name}</div>
+              </div>
+            )}
           </div>
 
           {/* Stats Principais - Design iOS/Android */}
@@ -172,12 +176,12 @@ export default function HomePage() {
         
         {/* Citação Minimalista */}
         {showQuote && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50 relative">
+          <div className="glass-card p-5 relative">
             <button
               onClick={() => setShowQuote(false)}
-              className="absolute top-4 right-4 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
+              className="absolute top-4 right-4 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"
             >
-              <X className="text-gray-500" size={14} />
+              <X className="text-white/70" size={14} />
             </button>
             
             <div className="flex gap-3">
@@ -185,25 +189,25 @@ export default function HomePage() {
                 <Lightbulb className="text-white" size={20} />
               </div>
               <div className="flex-1 pr-8">
-                <h3 className="text-gray-900 font-semibold text-sm mb-2 flex items-center gap-1">
+                <h3 className="text-white font-semibold text-sm mb-2 flex items-center gap-1">
                   Inspiração do Dia ✨
                 </h3>
-                <blockquote className="text-gray-700 text-sm leading-relaxed italic mb-2">
+                <blockquote className="text-white/90 text-sm leading-relaxed italic mb-2">
                   "{bibleQuote.text}"
                 </blockquote>
-                <cite className="text-gray-500 text-xs font-medium">— {bibleQuote.author}</cite>
+                <cite className="text-white/70 text-xs font-medium">— {bibleQuote.author}</cite>
               </div>
             </div>
           </div>
         )}
 
         {/* Ações Rápidas - Grid 2x2 Otimizado */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+        <div className="glass-card p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
               <Zap className="text-white" size={16} />
             </div>
-            <h2 className="text-gray-900 font-semibold text-base">Acesso Rápido</h2>
+            <h2 className="text-white font-semibold text-base">Acesso Rápido</h2>
           </div>
           
           <div className="grid grid-cols-2 gap-3">
@@ -240,8 +244,8 @@ export default function HomePage() {
         </div>
 
         {/* Widget de Força Diária */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100/50 overflow-hidden">
-          <div className="bg-gradient-to-r from-violet-500 to-purple-600 px-5 py-4">
+        <div className="bg-gray-800/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div className="bg-gradient-to-r from-violet-400/80 to-purple-500/80 px-5 py-4 backdrop-blur-sm border border-white/10">
             <h2 className="text-white font-semibold text-base flex items-center gap-2">
               <Heart className="text-white" size={18} />
               Força para Hoje
@@ -251,14 +255,14 @@ export default function HomePage() {
             {/* Resumo Rápido */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl flex items-center justify-center">
-                  <Flame className="text-green-600" size={24} />
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center border border-green-400/30">
+                  <Flame className="text-green-400" size={24} />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">
+                  <div className="text-2xl font-bold text-white">
                     {timeAbstinent.days > 0 ? timeAbstinent.days : timeAbstinent.hours > 0 ? timeAbstinent.hours : timeAbstinent.minutes}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-white/70">
                     {timeAbstinent.days > 0
                       ? timeAbstinent.days === 1 ? "dia limpo" : "dias limpos"
                       : timeAbstinent.hours > 0
@@ -269,7 +273,7 @@ export default function HomePage() {
               </div>
               <Link 
                 href="/estatistica"
-                className="text-violet-600 hover:text-violet-700 font-medium text-sm flex items-center gap-1"
+                className="text-violet-400 hover:text-violet-300 font-medium text-sm flex items-center gap-1"
               >
                 Ver detalhes <ChevronRight size={16} />
               </Link>
@@ -279,16 +283,16 @@ export default function HomePage() {
             {progress < 100 && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700">Próximo marco</span>
-                  <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+                  <span className="text-sm font-medium text-white">Próximo marco</span>
+                  <span className="text-sm text-white/70">{Math.round(progress)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-gray-600/50 rounded-full h-3 overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-violet-500 to-purple-600 rounded-full transition-all duration-1000 ease-out"
+                    className="h-full bg-gradient-to-r from-violet-400/90 to-purple-500/90 rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <div className="text-xs text-gray-500 text-center">
+                <div className="text-xs text-white/60 text-center">
                   Continue forte! Você está indo muito bem! 💪
                 </div>
               </div>
@@ -298,13 +302,13 @@ export default function HomePage() {
             <div className="flex gap-3">
               <Link 
                 href="/motivacao"
-                className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-medium py-3 px-4 rounded-xl transition-all text-center text-sm native-button-press"
+                className="flex-1 bg-gradient-to-r from-pink-400/80 to-rose-500/80 hover:from-pink-500/90 hover:to-rose-600/90 text-white font-medium py-3 px-4 rounded-xl transition-all text-center text-sm native-button-press backdrop-blur-sm border border-white/10"
               >
                 ✨ Motivação
               </Link>
               <Link 
                 href="/emergencia"
-                className="flex-1 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-medium py-3 px-4 rounded-xl transition-all text-center text-sm native-button-press"
+                className="flex-1 bg-gradient-to-r from-red-400/80 to-orange-500/80 hover:from-red-500/90 hover:to-orange-600/90 text-white font-medium py-3 px-4 rounded-xl transition-all text-center text-sm native-button-press backdrop-blur-sm border border-white/10"
               >
                 🚨 SOS
               </Link>
@@ -313,29 +317,35 @@ export default function HomePage() {
         </div>
 
         {/* Dica Motivacional Compacta */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-5 text-center">
+        <div className="bg-gradient-to-r from-emerald-400/80 to-teal-500/80 rounded-2xl p-5 text-center backdrop-blur-sm border border-white/10">
           <div className="flex justify-center mb-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
               <Star className="text-white" size={20} />
             </div>
           </div>
-          <h3 className="text-white font-semibold text-base mb-2">💡 Dica do Dia</h3>
+          <h3 className="text-white font-semibold text-base mb-2">💡 Insight da Recuperação</h3>
           <p className="text-white/90 text-sm leading-relaxed mb-3">
             {timeAbstinent.days === 0 
-              ? "Seu primeiro dia é o mais importante. Foque em passar pelas próximas 24 horas."
+              ? "Primeira batalha! Seu cérebro está se libertando das conexões viciantes. Você consegue!"
               : timeAbstinent.days < 7
-              ? "Os primeiros 7 dias são os mais desafiadores. Você está quase lá!"
+              ? "Semana crítica! A dopamina está se reequilibrando. Cada hora conta para sua recuperação."
               : timeAbstinent.days < 30
-              ? "Excelente! Agora é criar novos hábitos saudáveis para substituir os antigos."
-              : "Parabéns! Você já provou que consegue. Continue fortalecendo sua nova identidade."
+              ? "Excelente progresso! Seu cérebro está criando novas conexões saudáveis. Continue forte!"
+              : timeAbstinent.days < 90
+              ? "Transformação profunda! Sua mente está se libertando completamente do vício."
+              : "Renascimento total! Você provou que pode viver livre da pornografia. Inspirador!"
             }
           </p>
           <div className="bg-white/15 rounded-xl p-3">
             <p className="text-white text-xs font-medium">
-              <strong>Lembre-se:</strong> Cada minuto que você resiste, seu cérebro fica mais forte! 🧠💪
+              <strong>Lembre-se:</strong> Cada momento livre da pornografia reconstrói conexões saudáveis no seu cérebro! 🧠✨
             </p>
           </div>
         </div>
+
+
+
+
       </div>
 
       <BottomNavigation />

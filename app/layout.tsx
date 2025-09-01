@@ -3,9 +3,11 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { AddictionProvider } from "@/contexts/AddictionContext"
+import { PremiumProvider } from "@/contexts/PremiumContext"
 import InstallPWA from "@/components/InstallPWA"
 import { SplashScreenWrapper } from "@/components/SplashScreenWrapper"
 import { FloatingActionButton } from "@/components/FloatingActionButton"
+import { DataDebugger } from "@/components/DataDebugger"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -87,16 +89,19 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-TileImage" content="/144.png" />
       </head>
-      <body className={`${inter.className} bg-gradient-to-br from-blue-50 to-sky-100 text-gray-800 min-h-screen`}>
-        <AddictionProvider>
-          <SplashScreenWrapper>
-            <div className="max-w-sm mx-auto min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 relative">
-              {children}
-              <InstallPWA />
-              <FloatingActionButton />
-            </div>
-          </SplashScreenWrapper>
-        </AddictionProvider>
+      <body className={`${inter.className} min-h-screen`}>
+        <PremiumProvider>
+          <AddictionProvider>
+            <SplashScreenWrapper>
+              <div className="max-w-sm mx-auto min-h-screen relative">
+                {children}
+                <InstallPWA />
+                <FloatingActionButton />
+                <DataDebugger />
+              </div>
+            </SplashScreenWrapper>
+          </AddictionProvider>
+        </PremiumProvider>
       </body>
     </html>
   )

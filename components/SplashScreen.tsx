@@ -77,16 +77,14 @@ export function SplashScreen({ onComplete, duration = 2500 }: SplashScreenProps)
           }`}
         >
           <div className="relative">
-            <div className="w-32 h-32 mx-auto bg-white/10 backdrop-blur-lg rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl">
-              <img 
-                src="/512.png" 
-                alt="Purify Logo" 
-                className="w-24 h-24 drop-shadow-lg"
-              />
-            </div>
+            <img 
+              src="/512.png" 
+              alt="Purify Logo" 
+              className="w-32 h-32 mx-auto object-contain drop-shadow-2xl"
+            />
             
             {/* Efeito de pulso */}
-            <div className={`absolute inset-0 w-32 h-32 mx-auto bg-white/10 rounded-3xl ${
+            <div className={`absolute inset-0 w-32 h-32 mx-auto bg-white/20 rounded-full ${
               animationPhase === 'loading' ? 'animate-ping' : ''
             }`} />
           </div>
@@ -145,15 +143,19 @@ export const useSplashScreen = () => {
     // Verificar se é o primeiro carregamento ou uma nova sessão
     if (typeof window !== 'undefined') {
       const lastVisit = localStorage.getItem('last_visit')
+      const userId = localStorage.getItem('purify_user_id')
+      const hasUserData = userId && localStorage.getItem(`addictionData_${userId}`)
       const now = Date.now()
       const fiveMinutes = 5 * 60 * 1000
 
-      if (lastVisit && now - parseInt(lastVisit) < fiveMinutes) {
+      // Se o usuário já tem dados salvos, não mostrar splash na mesma sessão
+      if (hasUserData && lastVisit && now - parseInt(lastVisit) < fiveMinutes) {
         setIsFirstLoad(false)
         setShowSplash(false)
       } else {
         localStorage.setItem('last_visit', now.toString())
-        setShowSplash(true)
+        // Só mostrar splash se for realmente novo usuário ou primeira vez
+        setShowSplash(!hasUserData)
       }
     }
   }, [])

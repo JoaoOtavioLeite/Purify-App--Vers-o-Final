@@ -99,6 +99,19 @@ export function NotificationSettings({ onClose }: NotificationSettingsProps) {
     haptics.medium()
   }
 
+  const handleToggleAdvanced = async (feature: keyof NotificationSettings) => {
+    if (typeof settings[feature] === 'boolean') {
+      const newSettings = {
+        ...settings,
+        [feature]: !settings[feature]
+      }
+      
+      setSettings(newSettings)
+      await notifications.updateSettings(newSettings)
+      haptics.medium()
+    }
+  }
+
   const handleTestNotification = async () => {
     setIsLoading(true)
     haptics.medium()
@@ -287,6 +300,148 @@ export function NotificationSettings({ onClose }: NotificationSettingsProps) {
                         settings.milestones ? 'translate-x-6' : 'translate-x-0.5'
                       }`} />
                     </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notificações Avançadas */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <Star size={18} />
+                  Notificações Avançadas
+                </h3>
+                
+                <div className="space-y-3">
+                  {/* Relatórios Semanais */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">📊 Relatórios Semanais</p>
+                        <p className="text-gray-600 text-sm">Resumo do progresso aos domingos</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggleAdvanced('weeklyReports')}
+                        className={`w-12 h-6 rounded-full transition-all ${
+                          settings.weeklyReports
+                            ? 'bg-blue-500'
+                            : 'bg-gray-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                          settings.weeklyReports ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Citações Motivacionais */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">💬 Citações Motivacionais</p>
+                        <p className="text-gray-600 text-sm">Inspiração 3x por dia</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggleAdvanced('motivationalQuotes')}
+                        className={`w-12 h-6 rounded-full transition-all ${
+                          settings.motivationalQuotes
+                            ? 'bg-green-500'
+                            : 'bg-gray-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                          settings.motivationalQuotes ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Lembretes de Emergência */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">🚨 Lembretes de Emergência</p>
+                        <p className="text-gray-600 text-sm">Alertas em horários de risco</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggleAdvanced('emergencyReminders')}
+                        className={`w-12 h-6 rounded-full transition-all ${
+                          settings.emergencyReminders
+                            ? 'bg-red-500'
+                            : 'bg-gray-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                          settings.emergencyReminders ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Rastreamento de Hábitos */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">📝 Rastreamento de Hábitos</p>
+                        <p className="text-gray-600 text-sm">Check-ins regulares do dia</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggleAdvanced('habitTracking')}
+                        className={`w-12 h-6 rounded-full transition-all ${
+                          settings.habitTracking
+                            ? 'bg-indigo-500'
+                            : 'bg-gray-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                          settings.habitTracking ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Lembretes Espirituais */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">🙏 Lembretes Espirituais</p>
+                        <p className="text-gray-600 text-sm">Oração e leitura bíblica</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggleAdvanced('spiritualReminders')}
+                        className={`w-12 h-6 rounded-full transition-all ${
+                          settings.spiritualReminders
+                            ? 'bg-purple-500'
+                            : 'bg-gray-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                          settings.spiritualReminders ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Especiais de Fim de Semana */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-800">🎉 Especiais de Fim de Semana</p>
+                        <p className="text-gray-600 text-sm">Mensagens especiais sexta/sábado/domingo</p>
+                      </div>
+                      <button
+                        onClick={() => handleToggleAdvanced('weekendSpecial')}
+                        className={`w-12 h-6 rounded-full transition-all ${
+                          settings.weekendSpecial
+                            ? 'bg-orange-500'
+                            : 'bg-gray-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                          settings.weekendSpecial ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

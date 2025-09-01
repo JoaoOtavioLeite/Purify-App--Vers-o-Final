@@ -15,6 +15,12 @@ export interface NotificationSettings {
   evening: NotificationTime
   night: NotificationTime
   milestones: boolean
+  weeklyReports: boolean
+  motivationalQuotes: boolean
+  emergencyReminders: boolean
+  habitTracking: boolean
+  spiritualReminders: boolean
+  weekendSpecial: boolean
   permission: NotificationPermission
 }
 
@@ -41,6 +47,12 @@ export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {
     label: 'Boa Noite (Celebração)'
   },
   milestones: true,
+  weeklyReports: true,
+  motivationalQuotes: true,
+  emergencyReminders: true,
+  habitTracking: true,
+  spiritualReminders: true,
+  weekendSpecial: true,
   permission: 'default'
 }
 
@@ -151,7 +163,7 @@ export class NotificationManager {
         return
       }
 
-      // Enviar configurações para o service worker
+      // Agendar notificações diárias básicas
       this.serviceWorkerRegistration.active?.postMessage({
         type: 'SCHEDULE_DAILY_NOTIFICATIONS',
         data: {
@@ -164,7 +176,28 @@ export class NotificationManager {
         }
       })
 
-      console.log('📅 Notificações diárias reagendadas')
+      // Agendar todos os tipos adicionais de notificações
+      if (this.settings.weeklyReports) {
+        await this.scheduleWeeklyReport()
+      }
+
+      if (this.settings.motivationalQuotes) {
+        await this.scheduleMotivationalQuotes()
+      }
+
+      if (this.settings.habitTracking) {
+        await this.scheduleHabitTracking()
+      }
+
+      if (this.settings.spiritualReminders) {
+        await this.scheduleSpiritualReminders()
+      }
+
+      if (this.settings.weekendSpecial) {
+        await this.scheduleWeekendSpecials()
+      }
+
+      console.log('📅 Todas as notificações reagendadas')
     } catch (error) {
       console.error('❌ Erro ao agendar notificações:', error)
     }
@@ -188,6 +221,128 @@ export class NotificationManager {
     }
   }
 
+  // Agendar relatório semanal
+  async scheduleWeeklyReport(): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.weeklyReports) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_WEEKLY_REPORT',
+        data: { day: 'sunday', time: '09:00' }
+      })
+
+      console.log('📊 Relatório semanal agendado para domingos às 09:00')
+    } catch (error) {
+      console.error('❌ Erro ao agendar relatório semanal:', error)
+    }
+  }
+
+  // Agendar citações motivacionais aleatórias
+  async scheduleMotivationalQuotes(): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.motivationalQuotes) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_MOTIVATIONAL_QUOTES',
+        data: { 
+          intervals: ['10:30', '15:30', '20:30'], // 3 vezes por dia
+          randomize: true
+        }
+      })
+
+      console.log('💬 Citações motivacionais agendadas')
+    } catch (error) {
+      console.error('❌ Erro ao agendar citações:', error)
+    }
+  }
+
+  // Agendar lembretes de emergência (horários de risco)
+  async scheduleEmergencyReminders(riskyHours: string[]): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.emergencyReminders) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_EMERGENCY_REMINDERS',
+        data: { riskyHours }
+      })
+
+      console.log('🚨 Lembretes de emergência agendados para horários de risco')
+    } catch (error) {
+      console.error('❌ Erro ao agendar lembretes de emergência:', error)
+    }
+  }
+
+  // Agendar rastreamento de hábitos
+  async scheduleHabitTracking(): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.habitTracking) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_HABIT_TRACKING',
+        data: { 
+          checkInTimes: ['12:00', '18:00', '21:00'],
+          weeklyReview: 'saturday'
+        }
+      })
+
+      console.log('📝 Rastreamento de hábitos agendado')
+    } catch (error) {
+      console.error('❌ Erro ao agendar rastreamento:', error)
+    }
+  }
+
+  // Agendar lembretes espirituais
+  async scheduleSpiritualReminders(): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.spiritualReminders) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_SPIRITUAL_REMINDERS',
+        data: { 
+          prayerTimes: ['07:00', '12:00', '19:00'],
+          bibleReading: '20:00',
+          worship: 'sunday'
+        }
+      })
+
+      console.log('🙏 Lembretes espirituais agendados')
+    } catch (error) {
+      console.error('❌ Erro ao agendar lembretes espirituais:', error)
+    }
+  }
+
+  // Agendar notificações especiais de fim de semana
+  async scheduleWeekendSpecials(): Promise<void> {
+    try {
+      if (!this.serviceWorkerRegistration || !this.hasPermission() || !this.settings.weekendSpecial) {
+        return
+      }
+
+      this.serviceWorkerRegistration.active?.postMessage({
+        type: 'SCHEDULE_WEEKEND_SPECIALS',
+        data: { 
+          fridayEvening: '18:00',
+          saturdayMorning: '09:00',
+          sundayEvening: '17:00'
+        }
+      })
+
+      console.log('🎉 Notificações especiais de fim de semana agendadas')
+    } catch (error) {
+      console.error('❌ Erro ao agendar especiais de fim de semana:', error)
+    }
+  }
+
   // Enviar notificação de teste
   async sendTestNotification(): Promise<void> {
     try {
@@ -203,7 +358,7 @@ export class NotificationManager {
         tag: 'purify-test',
         data: { type: 'test' },
         actions: [
-          { action: 'open', title: '✨ Abrir App' }
+          { action: 'open', title: '✨ Abrir App', icon: undefined }
         ],
         vibrate: [200, 100, 200]
       })
@@ -259,6 +414,13 @@ export const useNotifications = () => {
     scheduleAllNotifications: () => manager.scheduleAllNotifications(),
     scheduleMilestoneNotification: (days: number) => 
       manager.scheduleMilestoneNotification(days),
+    scheduleWeeklyReport: () => manager.scheduleWeeklyReport(),
+    scheduleMotivationalQuotes: () => manager.scheduleMotivationalQuotes(),
+    scheduleEmergencyReminders: (riskyHours: string[]) => 
+      manager.scheduleEmergencyReminders(riskyHours),
+    scheduleHabitTracking: () => manager.scheduleHabitTracking(),
+    scheduleSpiritualReminders: () => manager.scheduleSpiritualReminders(),
+    scheduleWeekendSpecials: () => manager.scheduleWeekendSpecials(),
     sendTestNotification: () => manager.sendTestNotification()
   }
 }

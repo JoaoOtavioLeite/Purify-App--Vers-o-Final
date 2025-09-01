@@ -24,6 +24,8 @@ export function BreathingExercise({
   const [soundEnabled, setSoundEnabled] = useState(true)
   const haptics = useHaptics()
   const audioContextRef = useRef<AudioContext | null>(null)
+  const wakeLockRef = useRef<any>(null)
+  const lastUpdateTimeRef = useRef<number>(Date.now())
 
   // Configurações das técnicas
   const techniques = {
@@ -85,53 +87,102 @@ export function BreathingExercise({
     }
   }
 
-  // Timer principal
+  // Timer principal - simplificado e mais confiável
   useEffect(() => {
+    console.log('useEffect timer executado, isActive:', isActive, 'phase:', phase)
     let interval: NodeJS.Timeout
 
     if (isActive) {
+      console.log('Criando interval timer')
+      // Iniciar timer imediatamente quando ativo
       interval = setInterval(() => {
+        console.log('Interval disparado')
         setTimer(prev => {
-          const newTime = prev + 1
-          const phaseLength = currentTechnique.phases[phase]
-          
-          if (newTime >= phaseLength) {
-            // Feedback háptico nas transições
-            if (phase === "inhale") {
-              haptics.light()
-              playBreathingSound(440, 0.2) // A4 note
-            } else if (phase === "exhale") {
-              haptics.light()
-              playBreathingSound(220, 0.2) // A3 note
-            }
-
-            // Próxima fase
-            if (phase === "inhale") {
-              setPhase(currentTechnique.phases.hold > 0 ? "hold" : "exhale")
-            } else if (phase === "hold") {
-              setPhase("exhale")
-            } else if (phase === "exhale") {
-              if (currentTechnique.phases.pause > 0) {
-                setPhase("pause")
-              } else {
-                setPhase("inhale")
-                setCycles(prev => prev + 1)
-              }
-            } else if (phase === "pause") {
-              setPhase("inhale")
-              setCycles(prev => prev + 1)
-            }
-            
-            return 0
-          }
-          
-          return newTime
+          console.log(`Timer atual: ${prev}, incrementando para: ${prev + 1}`)
+          return prev + 1
         })
-      }, 1000)
+      }, 1000) // Timer simples de 1 segundo
+    } else {
+      console.log('Timer inativo, não criando interval')
     }
 
-    return () => clearInterval(interval)
-  }, [isActive, phase, currentTechnique, haptics, soundEnabled])
+    return () => {
+      console.log('Limpando interval')
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [isActive])
+
+  // Detectar mudanças de fase baseado no timer
+  useEffect(() => {
+    const phaseLength = currentTechnique.phases[phase]
+    console.log(`Verificando mudança de fase: timer=${timer}, phase=${phase}, length=${phaseLength}`)
+    
+    if (timer >= phaseLength && isActive) {
+      console.log('Mudando de fase...')
+      
+      // Feedback háptico nas transições
+      if (phase === "inhale") {
+        haptics.light()
+        playBreathingSound(440, 0.2)
+      } else if (phase === "exhale") {
+        haptics.light()
+        playBreathingSound(220, 0.2)
+      }
+
+      // Resetar timer e mudar fase
+      setTimer(0)
+      
+      // Próxima fase
+      if (phase === "inhale") {
+        setPhase(currentTechnique.phases.hold > 0 ? "hold" : "exhale")
+      } else if (phase === "hold") {
+        setPhase("exhale")
+      } else if (phase === "exhale") {
+        if (currentTechnique.phases.pause > 0) {
+          setPhase("pause")
+        } else {
+          setPhase("inhale")
+          setCycles(prev => prev + 1)
+        }
+      } else if (phase === "pause") {
+        setPhase("inhale")
+        setCycles(prev => prev + 1)
+      }
+    }
+  }, [timer, phase, currentTechnique, haptics, soundEnabled, isActive])
+
+  // Prevenir que a tela desligue durante o exercício
+  useEffect(() => {
+    const requestWakeLock = async () => {
+      if (isActive && 'wakeLock' in navigator) {
+        try {
+          wakeLockRef.current = await (navigator as any).wakeLock.request('screen')
+          console.log('Wake Lock ativado')
+        } catch (err) {
+          console.log('Wake Lock não disponível:', err)
+        }
+      } else if (!isActive && wakeLockRef.current) {
+        try {
+          await wakeLockRef.current.release()
+          wakeLockRef.current = null
+          console.log('Wake Lock desativado')
+        } catch (err) {
+          console.log('Erro ao liberar Wake Lock:', err)
+        }
+      }
+    }
+
+    requestWakeLock()
+
+    return () => {
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {})
+        wakeLockRef.current = null
+      }
+    }
+  }, [isActive])
 
   // Notificar conclusão de ciclos
   useEffect(() => {
@@ -141,10 +192,40 @@ export function BreathingExercise({
     }
   }, [cycles, haptics, onComplete])
 
+  // Detectar quando a página perde/ganha foco
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('Página perdeu foco - timer pode pausar')
+      } else {
+        console.log('Página ganhou foco - timer deve continuar')
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
   const toggleBreathing = () => {
-    setIsActive(!isActive)
+    console.log('toggleBreathing chamado, isActive atual:', isActive)
+    
     if (!isActive) {
+      // Resetar todos os estados
+      setTimer(0)
+      setPhase("inhale")
+      setCycles(0)
+      lastUpdateTimeRef.current = Date.now()
       haptics.medium()
+      console.log('Iniciando exercício - Timer: 0, Phase: inhale')
+      
+      // Ativar imediatamente (sem setTimeout)
+      setIsActive(true)
+    } else {
+      console.log('Pausando exercício')
+      setIsActive(false)
     }
   }
 
@@ -153,6 +234,7 @@ export function BreathingExercise({
     setPhase("inhale")
     setTimer(0)
     setCycles(0)
+    lastUpdateTimeRef.current = Date.now() // Resetar timestamp
     haptics.light()
   }
 
@@ -182,16 +264,16 @@ export function BreathingExercise({
     }
   }
 
-  const progress = (timer / currentTechnique.phases[phase]) * 100
+  const progress = Math.min(100, Math.max(0, ((timer + 1) / currentTechnique.phases[phase]) * 100))
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-gradient-to-br from-gray-900/90 via-purple-900/90 to-violet-900/90 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/20 ${className}`}>
       {/* Header */}
       <div className="text-center mb-6">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+        <h3 className="text-xl font-bold text-white mb-2">
           {currentTechnique.name}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+        <p className="text-white/70 text-sm">
           {currentTechnique.description}
         </p>
       </div>
@@ -209,7 +291,7 @@ export function BreathingExercise({
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className="text-gray-200 dark:text-gray-700"
+              className="text-white/20"
             />
             {/* Progresso */}
             <circle
@@ -227,8 +309,8 @@ export function BreathingExercise({
             {/* Gradiente */}
             <defs>
               <linearGradient id="breathing-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#3B82F6" />
-                <stop offset="100%" stopColor="#06B6D4" />
+                <stop offset="0%" stopColor="#A855F7" />
+                <stop offset="100%" stopColor="#7C3AED" />
               </linearGradient>
             </defs>
           </svg>
@@ -238,16 +320,24 @@ export function BreathingExercise({
             <div className="text-4xl mb-2 animate-pulse">
               {getPhaseEmoji()}
             </div>
-            <div className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-1">
+            <div className={`text-3xl font-bold mb-1 transition-all duration-300 ${
+              timer === currentTechnique.phases[phase] - 1
+                ? 'text-purple-400 scale-110' 
+                : 'text-white'
+            }`}>
               {timer}
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+            <div className="text-sm font-medium text-white/80 uppercase tracking-wide">
               {phase === "inhale" ? "Inspire" :
                phase === "hold" ? "Segure" :
                phase === "exhale" ? "Expire" : "Pause"}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+            <div className="text-xs text-white/60 mt-1">
               {currentTechnique.phases[phase]}s
+            </div>
+            {/* Status indicator */}
+            <div className="text-xs text-white/60 mt-1">
+              {isActive ? `${timer}s` : 'Pausado'}
             </div>
           </div>
         </div>
@@ -255,7 +345,7 @@ export function BreathingExercise({
 
       {/* Instrução */}
       <div className="text-center mb-6">
-        <p className="text-gray-700 dark:text-gray-300 font-medium text-lg leading-relaxed">
+        <p className="text-white/90 font-medium text-lg leading-relaxed">
           {getPhaseInstruction()}
         </p>
       </div>
@@ -263,16 +353,16 @@ export function BreathingExercise({
       {/* Estatísticas */}
       <div className="flex justify-center gap-6 mb-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div className="text-2xl font-bold text-blue-400">
             {cycles}
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">Ciclos</div>
+          <div className="text-xs text-white/60">Ciclos</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <div className="text-2xl font-bold text-green-400">
             {Math.floor(cycles * (Object.values(currentTechnique.phases).reduce((a, b) => a + b, 0)) / 60)}
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">Minutos</div>
+          <div className="text-xs text-white/60">Minutos</div>
         </div>
       </div>
 
@@ -292,7 +382,7 @@ export function BreathingExercise({
 
         <button
           onClick={reset}
-          className="flex items-center gap-2 px-4 py-3 rounded-xl font-semibold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-all shadow-md"
+          className="flex items-center gap-2 px-4 py-3 rounded-xl font-semibold bg-purple-600/30 border border-purple-400/30 hover:bg-purple-600/50 text-white transition-all shadow-md"
         >
           <RotateCcw size={20} />
           Reset
@@ -300,16 +390,16 @@ export function BreathingExercise({
 
         <button
           onClick={() => setSoundEnabled(!soundEnabled)}
-          className="flex items-center gap-2 px-4 py-3 rounded-xl font-semibold bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-all shadow-md"
+          className="flex items-center gap-2 px-4 py-3 rounded-xl font-semibold bg-purple-600/30 border border-purple-400/30 hover:bg-purple-600/50 text-white transition-all shadow-md"
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
       </div>
 
       {/* Dicas */}
-      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-        <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">💡 Dicas:</h4>
-        <ul className="text-blue-700 dark:text-blue-300 text-sm space-y-1">
+      <div className="mt-6 p-4 bg-purple-500/20 rounded-xl border border-purple-400/30">
+        <h4 className="font-semibold text-purple-200 mb-2">💡 Dicas:</h4>
+        <ul className="text-purple-100/90 text-sm space-y-1">
           <li>• Encontre uma posição confortável</li>
           <li>• Respire com o diafragma, não só com o peito</li>
           <li>• Foque apenas na respiração</li>

@@ -101,6 +101,101 @@ const MILESTONE_MESSAGES = [
   }
 ]
 
+// Citações motivacionais
+const MOTIVATIONAL_QUOTES = [
+  {
+    title: '💪 Força Interior',
+    body: 'Você é mais forte do que qualquer tentação. Confie na sua capacidade de resistir!'
+  },
+  {
+    title: '🌱 Crescimento',
+    body: 'Cada "não" que você diz à tentação é um "sim" para sua nova vida.'
+  },
+  {
+    title: '🎯 Foco no Objetivo',
+    body: 'Lembre-se do motivo pelo qual você começou. Sua liberdade vale cada esforço!'
+  },
+  {
+    title: '🔥 Determinação',
+    body: 'Você já chegou tão longe! Não deixe que alguns minutos destruam dias de progresso.'
+  },
+  {
+    title: '✨ Transformação',
+    body: 'Você está se tornando a melhor versão de si mesmo. Continue nessa jornada!'
+  }
+]
+
+// Lembretes de emergência
+const EMERGENCY_REMINDERS = [
+  {
+    title: '🚨 Momento de Atenção!',
+    body: 'Este é um horário de risco. Respire fundo e lembre-se dos seus objetivos!'
+  },
+  {
+    title: '🛡️ Proteção Ativa',
+    body: 'Hora de usar suas estratégias de proteção. Você consegue superar isso!'
+  },
+  {
+    title: '⚡ Força Agora',
+    body: 'Momento crítico! Faça algo diferente: exercite-se, ore ou chame alguém.'
+  }
+]
+
+// Rastreamento de hábitos
+const HABIT_TRACKING = [
+  {
+    title: '📝 Check-in Diário',
+    body: 'Como está seu dia? Registre seu progresso e sentimentos no app.'
+  },
+  {
+    title: '🎯 Hábitos Saudáveis',
+    body: 'Que tal praticar um hábito positivo agora? Exercício, leitura ou meditação?'
+  },
+  {
+    title: '📊 Reflexão do Dia',
+    body: 'Momento de refletir: o que funcionou bem hoje? O que pode melhorar?'
+  }
+]
+
+// Lembretes espirituais
+const SPIRITUAL_REMINDERS = [
+  {
+    title: '🙏 Momento de Oração',
+    body: 'Pare alguns minutos para conversar com Deus. Ele está sempre pronto a te ouvir.'
+  },
+  {
+    title: '📖 Palavra de Vida',
+    body: 'Que tal ler um versículo bíblico? A Palavra de Deus fortalece sua alma.'
+  },
+  {
+    title: '✨ Gratidão',
+    body: 'Pense em 3 coisas pelas quais você é grato hoje. Deus tem sido bom!'
+  },
+  {
+    title: '⛪ Comunhão',
+    body: 'Lembre-se de buscar comunhão com outros cristãos. Juntos somos mais fortes!'
+  }
+]
+
+// Notificações especiais de fim de semana
+const WEEKEND_SPECIALS = [
+  {
+    type: 'friday',
+    title: '🎉 Sexta-feira Vitoriosa!',
+    body: 'Mais uma semana de conquistas! Comemore suas vitórias e descanse bem.'
+  },
+  {
+    type: 'saturday',
+    title: '🌅 Sábado de Renovação',
+    body: 'Use este dia para renovar suas forças. Tempo com Deus e descanso são essenciais!'
+  },
+  {
+    type: 'sunday',
+    title: '⛪ Domingo Abençoado',
+    body: 'Dia especial para adoração e preparação para uma nova semana de vitórias!'
+  }
+]
+
 // Instalar Service Worker
 self.addEventListener('install', (event) => {
   console.log('🔔 Service Worker de Notificações instalado')
@@ -123,6 +218,24 @@ self.addEventListener('message', (event) => {
       break
     case 'SCHEDULE_MILESTONE_NOTIFICATION':
       scheduleMilestoneNotification(data.days)
+      break
+    case 'SCHEDULE_WEEKLY_REPORT':
+      scheduleWeeklyReport(data.day, data.time)
+      break
+    case 'SCHEDULE_MOTIVATIONAL_QUOTES':
+      scheduleMotivationalQuotes(data.intervals, data.randomize)
+      break
+    case 'SCHEDULE_EMERGENCY_REMINDERS':
+      scheduleEmergencyReminders(data.riskyHours)
+      break
+    case 'SCHEDULE_HABIT_TRACKING':
+      scheduleHabitTracking(data.checkInTimes, data.weeklyReview)
+      break
+    case 'SCHEDULE_SPIRITUAL_REMINDERS':
+      scheduleSpiritualReminders(data.prayerTimes, data.bibleReading, data.worship)
+      break
+    case 'SCHEDULE_WEEKEND_SPECIALS':
+      scheduleWeekendSpecials(data.fridayEvening, data.saturdayMorning, data.sundayEvening)
       break
     case 'CANCEL_ALL_NOTIFICATIONS':
       cancelAllNotifications()
@@ -342,5 +455,285 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('notificationclose', (event) => {
   console.log('🔔 Notificação fechada:', event.notification.tag)
 })
+
+// Função para agendar relatório semanal
+function scheduleWeeklyReport(day, time) {
+  const now = new Date()
+  const targetDay = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(day.toLowerCase())
+  
+  if (targetDay === -1) return
+  
+  const nextDate = new Date(now)
+  const currentDay = nextDate.getDay()
+  const daysUntilTarget = (targetDay - currentDay + 7) % 7 || 7
+  
+  nextDate.setDate(nextDate.getDate() + daysUntilTarget)
+  const [hours, minutes] = time.split(':').map(Number)
+  nextDate.setHours(hours, minutes, 0, 0)
+  
+  const delay = nextDate.getTime() - now.getTime()
+  
+  setTimeout(() => {
+    self.registration.showNotification('📊 Relatório Semanal', {
+      body: 'Veja seu progresso da semana e planeje os próximos dias!',
+      icon: '/192.png',
+      badge: '/72.png',
+      tag: 'purify-weekly-report',
+      data: { type: 'weekly-report' },
+      actions: [
+        { action: 'view-stats', title: '📊 Ver Estatísticas' },
+        { action: 'plan-week', title: '📅 Planejar Semana' }
+      ],
+      vibrate: [200, 100, 200]
+    })
+    
+    // Reagendar para próxima semana
+    setInterval(() => {
+      self.registration.showNotification('📊 Relatório Semanal', {
+        body: 'Veja seu progresso da semana e planeje os próximos dias!',
+        icon: '/192.png',
+        badge: '/72.png',
+        tag: 'purify-weekly-report',
+        data: { type: 'weekly-report' },
+        actions: [
+          { action: 'view-stats', title: '📊 Ver Estatísticas' },
+          { action: 'plan-week', title: '📅 Planejar Semana' }
+        ],
+        vibrate: [200, 100, 200]
+      })
+    }, 7 * 24 * 60 * 60 * 1000) // 7 dias
+  }, delay)
+  
+  console.log(`📊 Relatório semanal agendado para ${day} às ${time}`)
+}
+
+// Função para agendar citações motivacionais
+function scheduleMotivationalQuotes(intervals, randomize) {
+  intervals.forEach((time, index) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const [hours, minutes] = time.split(':').map(Number)
+    const notificationTime = new Date(today)
+    notificationTime.setHours(hours, minutes, 0, 0)
+    
+    if (notificationTime <= now) {
+      notificationTime.setDate(notificationTime.getDate() + 1)
+    }
+    
+    const delay = notificationTime.getTime() - now.getTime()
+    
+    setTimeout(() => {
+      const sendQuote = () => {
+        const quote = randomize 
+          ? MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]
+          : MOTIVATIONAL_QUOTES[index % MOTIVATIONAL_QUOTES.length]
+        
+        self.registration.showNotification(quote.title, {
+          body: quote.body,
+          icon: '/192.png',
+          badge: '/72.png',
+          tag: `purify-quote-${time.replace(':', '')}`,
+          data: { type: 'motivational-quote' },
+          actions: [
+            { action: 'share-quote', title: '📱 Compartilhar' },
+            { action: 'more-motivation', title: '💪 Mais Motivação' }
+          ],
+          vibrate: [100, 50, 100]
+        })
+      }
+      
+      sendQuote()
+      
+      // Reagendar para todos os dias
+      setInterval(sendQuote, 24 * 60 * 60 * 1000)
+    }, delay)
+  })
+  
+  console.log('💬 Citações motivacionais agendadas para:', intervals)
+}
+
+// Função para agendar lembretes de emergência
+function scheduleEmergencyReminders(riskyHours) {
+  riskyHours.forEach(time => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const [hours, minutes] = time.split(':').map(Number)
+    const notificationTime = new Date(today)
+    notificationTime.setHours(hours, minutes, 0, 0)
+    
+    if (notificationTime <= now) {
+      notificationTime.setDate(notificationTime.getDate() + 1)
+    }
+    
+    const delay = notificationTime.getTime() - now.getTime()
+    
+    setTimeout(() => {
+      const sendReminder = () => {
+        const reminder = EMERGENCY_REMINDERS[Math.floor(Math.random() * EMERGENCY_REMINDERS.length)]
+        
+        self.registration.showNotification(reminder.title, {
+          body: reminder.body,
+          icon: '/192.png',
+          badge: '/72.png',
+          tag: `purify-emergency-${time.replace(':', '')}`,
+          data: { type: 'emergency-reminder' },
+          actions: [
+            { action: 'sos', title: '🚨 SOS' },
+            { action: 'distract', title: '🎯 Distrair-me' }
+          ],
+          requireInteraction: true,
+          vibrate: [300, 100, 300, 100, 300]
+        })
+      }
+      
+      sendReminder()
+      
+      // Reagendar para todos os dias
+      setInterval(sendReminder, 24 * 60 * 60 * 1000)
+    }, delay)
+  })
+  
+  console.log('🚨 Lembretes de emergência agendados para:', riskyHours)
+}
+
+// Função para agendar rastreamento de hábitos
+function scheduleHabitTracking(checkInTimes, weeklyReview) {
+  checkInTimes.forEach((time, index) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const [hours, minutes] = time.split(':').map(Number)
+    const notificationTime = new Date(today)
+    notificationTime.setHours(hours, minutes, 0, 0)
+    
+    if (notificationTime <= now) {
+      notificationTime.setDate(notificationTime.getDate() + 1)
+    }
+    
+    const delay = notificationTime.getTime() - now.getTime()
+    
+    setTimeout(() => {
+      const sendTracking = () => {
+        const tracking = HABIT_TRACKING[index % HABIT_TRACKING.length]
+        
+        self.registration.showNotification(tracking.title, {
+          body: tracking.body,
+          icon: '/192.png',
+          badge: '/72.png',
+          tag: `purify-habit-${time.replace(':', '')}`,
+          data: { type: 'habit-tracking' },
+          actions: [
+            { action: 'log-mood', title: '😊 Registrar Humor' },
+            { action: 'track-habits', title: '✅ Marcar Hábitos' }
+          ],
+          vibrate: [150, 100, 150]
+        })
+      }
+      
+      sendTracking()
+      
+      // Reagendar para todos os dias
+      setInterval(sendTracking, 24 * 60 * 60 * 1000)
+    }, delay)
+  })
+  
+  console.log('📝 Rastreamento de hábitos agendado para:', checkInTimes)
+}
+
+// Função para agendar lembretes espirituais
+function scheduleSpiritualReminders(prayerTimes, bibleReading, worship) {
+  // Agendar horários de oração
+  prayerTimes.forEach((time, index) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const [hours, minutes] = time.split(':').map(Number)
+    const notificationTime = new Date(today)
+    notificationTime.setHours(hours, minutes, 0, 0)
+    
+    if (notificationTime <= now) {
+      notificationTime.setDate(notificationTime.getDate() + 1)
+    }
+    
+    const delay = notificationTime.getTime() - now.getTime()
+    
+    setTimeout(() => {
+      const sendSpiritual = () => {
+        const spiritual = SPIRITUAL_REMINDERS[index % SPIRITUAL_REMINDERS.length]
+        
+        self.registration.showNotification(spiritual.title, {
+          body: spiritual.body,
+          icon: '/192.png',
+          badge: '/72.png',
+          tag: `purify-spiritual-${time.replace(':', '')}`,
+          data: { type: 'spiritual-reminder' },
+          actions: [
+            { action: 'pray', title: '🙏 Orar Agora' },
+            { action: 'read-bible', title: '📖 Ler Bíblia' }
+          ],
+          vibrate: [200, 100, 200]
+        })
+      }
+      
+      sendSpiritual()
+      
+      // Reagendar para todos os dias
+      setInterval(sendSpiritual, 24 * 60 * 60 * 1000)
+    }, delay)
+  })
+  
+  console.log('🙏 Lembretes espirituais agendados para:', prayerTimes)
+}
+
+// Função para agendar notificações especiais de fim de semana
+function scheduleWeekendSpecials(fridayEvening, saturdayMorning, sundayEvening) {
+  const scheduleWeekendNotification = (dayIndex, time, specialType) => {
+    const now = new Date()
+    const currentDay = now.getDay()
+    const daysUntilTarget = (dayIndex - currentDay + 7) % 7
+    
+    const targetDate = new Date(now)
+    targetDate.setDate(targetDate.getDate() + daysUntilTarget)
+    const [hours, minutes] = time.split(':').map(Number)
+    targetDate.setHours(hours, minutes, 0, 0)
+    
+    if (targetDate <= now) {
+      targetDate.setDate(targetDate.getDate() + 7)
+    }
+    
+    const delay = targetDate.getTime() - now.getTime()
+    
+    setTimeout(() => {
+      const sendWeekendSpecial = () => {
+        const special = WEEKEND_SPECIALS.find(s => s.type === specialType)
+        
+        if (special) {
+          self.registration.showNotification(special.title, {
+            body: special.body,
+            icon: '/192.png',
+            badge: '/72.png',
+            tag: `purify-weekend-${specialType}`,
+            data: { type: 'weekend-special', specialType },
+            actions: [
+              { action: 'celebrate', title: '🎉 Celebrar' },
+              { action: 'plan', title: '📅 Planejar' }
+            ],
+            vibrate: [200, 100, 200, 100, 200]
+          })
+        }
+      }
+      
+      sendWeekendSpecial()
+      
+      // Reagendar para próxima semana
+      setInterval(sendWeekendSpecial, 7 * 24 * 60 * 60 * 1000)
+    }, delay)
+  }
+  
+  // Sexta à noite (5), Sábado de manhã (6), Domingo à noite (0)
+  scheduleWeekendNotification(5, fridayEvening, 'friday')
+  scheduleWeekendNotification(6, saturdayMorning, 'saturday')
+  scheduleWeekendNotification(0, sundayEvening, 'sunday')
+  
+  console.log('🎉 Notificações especiais de fim de semana agendadas')
+}
 
 console.log('🔔 Service Worker de Notificações carregado')

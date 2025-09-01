@@ -225,9 +225,18 @@ export default function GamificacaoPage() {
     
     setUserPoints(finalPoints)
 
-    // Determinar nível atual
-    const currentLevel = levels.reverse().find(level => finalPoints >= level.pointsRequired) || levels[0]
+    // Determinar nível atual - verificar do maior para o menor
+    let currentLevel = levels[0] // Default para nível 1
+    for (let i = levels.length - 1; i >= 0; i--) {
+      if (finalPoints >= levels[i].pointsRequired) {
+        currentLevel = levels[i]
+        break
+      }
+    }
     setUserLevel(currentLevel.level)
+    
+    // Log apenas para verificação
+    console.log(`🎮 Usuário nível ${currentLevel.level} (${currentLevel.title}) com ${finalPoints} pontos`)
     
     // Calcular experiência para próximo nível
     const nextLevel = levels.find(level => level.level === currentLevel.level + 1)
@@ -259,7 +268,7 @@ export default function GamificacaoPage() {
 
       const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(achievementsCardRef.current, {
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#1e1b4b',
         scale: 2,
         useCORS: true,
         allowTaint: false,
@@ -326,11 +335,11 @@ export default function GamificacaoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 pb-12">
       {/* Header com Nível e Pontos */}
       <div className="bg-gradient-to-r from-purple-500 to-indigo-600 pt-14 pb-6 px-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
+        <div className="absolute top-0 right-0 w-40 h-40 glass-card/10 rounded-full -translate-y-20 translate-x-20"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 glass-card/10 rounded-full translate-y-16 -translate-x-16"></div>
         
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
@@ -338,14 +347,14 @@ export default function GamificacaoPage() {
               <h1 className="text-xl font-medium text-white">Gamificação</h1>
               <p className="text-white/80 text-sm">Seu progresso em conquistas</p>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-3 text-center">
+            <div className="glass-card/20 backdrop-blur-sm rounded-2xl px-4 py-3 text-center">
               <div className="text-xl font-bold text-white">{userPoints.toLocaleString()}</div>
               <div className="text-white/90 text-xs font-medium">pontos XP</div>
             </div>
           </div>
 
           {/* Nível Atual */}
-          <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4">
+          <div className="glass-card/15 backdrop-blur-md rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl ${currentLevelData.color} flex items-center justify-center`}>
@@ -366,9 +375,9 @@ export default function GamificacaoPage() {
             
             {nextLevelData && (
               <div>
-                <div className="bg-white/20 rounded-full h-2 overflow-hidden">
+                <div className="glass-card/20 rounded-full h-2 overflow-hidden">
                   <div 
-                    className="bg-white h-full transition-all duration-500 rounded-full"
+                    className="glass-card h-full transition-all duration-500 rounded-full"
                     style={{ width: `${userExperience}%` }}
                   />
                 </div>
@@ -383,41 +392,63 @@ export default function GamificacaoPage() {
 
       <div className="px-4 -mt-2 relative z-20 space-y-4">
         {/* Conquistas Desbloqueadas */}
-        <div ref={achievementsCardRef} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+        <div ref={achievementsCardRef} className="glass-card rounded-2xl p-5 shadow-sm relative" style={{background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(88, 28, 135, 0.9) 50%, rgba(124, 58, 237, 0.9) 100%)'}}>
+          {/* Watermark do Purify para compartilhamento */}
+          <div className="absolute top-3 right-3 opacity-30">
+            <span className="text-white text-xs font-bold">PURIFY</span>
+          </div>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
               <Trophy className="text-white" size={20} />
             </div>
             <div>
-              <h2 className="text-gray-900 font-semibold text-base">Conquistas Desbloqueadas</h2>
-              <p className="text-gray-600 text-sm">{unlockedAchievements.length} de {achievements.length} desbloqueadas</p>
+              <h2 className="text-white font-semibold text-base">Conquistas Desbloqueadas</h2>
+              <p className="text-white/80 text-sm">{unlockedAchievements.length} de {achievements.length} desbloqueadas</p>
             </div>
           </div>
           {unlockedAchievements.length === 0 ? (
             <div className="text-center py-8">
-              <Award className="text-gray-400 mx-auto mb-3" size={48} />
-              <p className="text-gray-500">Nenhuma conquista desbloqueada ainda</p>
-              <p className="text-gray-400 text-sm">Continue sua jornada para desbloquear!</p>
+              <Award className="text-white/60 mx-auto mb-3" size={48} />
+              <p className="text-white/70">Nenhuma conquista desbloqueada ainda</p>
+              <p className="text-white/60 text-sm">Continue sua jornada para desbloquear!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {unlockedAchievements.map((achievement) => (
                 <div
                   key={achievement.id}
-                  className="bg-green-50 border-2 border-green-200 rounded-xl p-4 transform hover:scale-105 transition-all"
+                  className="bg-gradient-to-br from-green-500/30 to-emerald-600/30 border border-green-400/50 rounded-2xl p-4 transform hover:scale-[1.02] transition-all duration-300 shadow-lg backdrop-blur-sm relative overflow-hidden"
                 >
-                  <div className="flex items-center gap-3 mb-2">
-                    {achievement.icon}
-                    <div>
-                      <h3 className="font-bold text-gray-800">{achievement.title}</h3>
-                      <p className="text-gray-600 text-sm">{achievement.description}</p>
+                  {/* Brilho de fundo */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl"></div>
+                  
+                  <div className="relative z-10">
+                    {/* Header com ícone e título */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                        {achievement.icon}
+                      </div>
+                      <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                        <span className="text-xs">🏆</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-3">
-                    <span className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
-                      ✓ Desbloqueada
-                    </span>
-                    <span className="text-green-600 font-bold">+{achievement.points} XP</span>
+                    
+                    {/* Conteúdo principal */}
+                    <div className="mb-4">
+                      <h3 className="font-bold text-white text-base mb-1 leading-tight">{achievement.title}</h3>
+                      <p className="text-white/80 text-xs leading-relaxed">{achievement.description}</p>
+                    </div>
+                    
+                    {/* Footer com status e pontos */}
+                    <div className="flex items-center justify-between">
+                      <span className="bg-green-400 text-green-900 px-2 py-1 rounded-lg text-xs font-bold">
+                        ✓ Desbloqueada
+                      </span>
+                      <div className="text-right">
+                        <span className="text-yellow-400 font-bold text-sm">{achievement.points}</span>
+                        <span className="text-white/60 text-xs ml-1">XP</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -426,35 +457,53 @@ export default function GamificacaoPage() {
         </div>
 
         {/* Conquistas Bloqueadas */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/50">
+        <div className="glass-card rounded-2xl p-5 shadow-sm ">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-gray-500 rounded-xl flex items-center justify-center">
               <Target className="text-white" size={20} />
             </div>
             <div>
-              <h2 className="text-gray-900 font-semibold text-base">Próximas Conquistas</h2>
-              <p className="text-gray-600 text-sm">{lockedAchievements.length} disponíveis para desbloquear</p>
+              <h2 className="text-white font-semibold text-base">Próximas Conquistas</h2>
+              <p className="text-white/80 text-sm">{lockedAchievements.length} disponíveis para desbloquear</p>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {lockedAchievements.map((achievement) => (
               <div
                 key={achievement.id}
-                className="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 opacity-75"
+                className="bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 rounded-2xl p-4 transform hover:scale-[1.02] transition-all duration-300 shadow-lg backdrop-blur-sm relative overflow-hidden opacity-70"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="opacity-50">{achievement.icon}</div>
-                  <div>
-                    <h3 className="font-bold text-gray-600">{achievement.title}</h3>
-                    <p className="text-gray-500 text-sm">{achievement.description}</p>
+                {/* Brilho de fundo sutil */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl"></div>
+                
+                <div className="relative z-10">
+                  {/* Header com ícone e título */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-12 h-12 bg-gray-500/50 rounded-xl flex items-center justify-center shadow-lg">
+                      <div className="opacity-60">{achievement.icon}</div>
+                    </div>
+                    <div className="w-6 h-6 bg-gray-400/50 rounded-full flex items-center justify-center">
+                      <span className="text-xs opacity-60">🔒</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex justify-between items-center mt-3">
-                  <span className="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
-                    🔒 Bloqueada
-                  </span>
-                  <span className="text-gray-500 font-bold">{achievement.points} XP</span>
+                  
+                  {/* Conteúdo principal */}
+                  <div className="mb-4">
+                    <h3 className="font-bold text-white/80 text-base mb-1 leading-tight">{achievement.title}</h3>
+                    <p className="text-white/60 text-xs leading-relaxed">{achievement.description}</p>
+                  </div>
+                  
+                  {/* Footer com status e pontos */}
+                  <div className="flex items-center justify-between">
+                    <span className="bg-gray-400/30 text-white/60 px-2 py-1 rounded-lg text-xs font-bold">
+                      🔒 Bloqueada
+                    </span>
+                    <div className="text-right">
+                      <span className="text-gray-400 font-bold text-sm">{achievement.points}</span>
+                      <span className="text-white/40 text-xs ml-1">XP</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -462,22 +511,22 @@ export default function GamificacaoPage() {
         </div>
 
         {/* Todos os Níveis */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-blue-100">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Zap className="text-blue-600" size={24} />
+        <div className="glass-card rounded-2xl p-6 shadow-lg">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <Zap className="text-blue-400" size={24} />
             Sistema de Níveis
           </h2>
           
           <div className="space-y-3">
-            {levels.reverse().map((level) => (
+            {[...levels].reverse().map((level) => (
               <div
                 key={level.level}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   level.level === userLevel
-                    ? "bg-blue-50 border-blue-300 ring-2 ring-blue-200"
+                    ? "bg-blue-500/20 border-blue-400 ring-2 ring-blue-400/30"
                     : level.level < userLevel
-                    ? "bg-green-50 border-green-200"
-                    : "bg-gray-50 border-gray-200"
+                    ? "bg-green-500/20 border-green-400"
+                    : "bg-white/10 border-white/30"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -486,35 +535,35 @@ export default function GamificacaoPage() {
                       {level.icon}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-800">
+                      <h3 className="font-bold text-white">
                         Nível {level.level}: {level.title}
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-white/80 text-sm">
                         {level.pointsRequired.toLocaleString()} pontos necessários
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     {level.level < userLevel && (
-                      <span className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
+                      <span className="bg-green-400 text-white px-3 py-1 rounded-full text-xs font-medium">
                         ✓ Completado
                       </span>
                     )}
                     {level.level === userLevel && (
-                      <span className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+                      <span className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs font-medium">
                         🌟 Atual
                       </span>
                     )}
                     {level.level > userLevel && (
-                      <span className="bg-gray-200 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
-                        🔒 Bloqueado
+                      <span className="bg-white/20 text-white/70 px-3 py-1 rounded-full text-xs font-medium">
+                        🔒 Bloqueado ({userPoints}/{level.pointsRequired} pts)
                       </span>
                     )}
                   </div>
                 </div>
                 
                 <div className="mt-3">
-                  <p className="text-gray-600 text-sm mb-2">Recompensas:</p>
+                  <p className="text-white/80 text-sm mb-2">Recompensas:</p>
                   <div className="flex flex-wrap gap-2">
                     {level.rewards.map((reward, index) => (
                       <span
@@ -534,25 +583,25 @@ export default function GamificacaoPage() {
         {/* Estatísticas de Gamificação */}
         <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl p-5 text-center">
           <div className="flex justify-center mb-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 glass-card/20 rounded-xl flex items-center justify-center">
               <TrendingUp className="text-white" size={20} />
             </div>
           </div>
           <h3 className="text-white font-semibold text-base mb-4">🎮 Suas Estatísticas</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white/15 rounded-xl p-3">
+            <div className="glass-card/15 rounded-xl p-3">
               <div className="text-xl font-bold text-white">{userLevel}</div>
               <div className="text-white/80 text-xs font-medium">Nível Atual</div>
             </div>
-            <div className="bg-white/15 rounded-xl p-3">
+            <div className="glass-card/15 rounded-xl p-3">
               <div className="text-xl font-bold text-white">{unlockedAchievements.length}</div>
               <div className="text-white/80 text-xs font-medium">Conquistas</div>
             </div>
-            <div className="bg-white/15 rounded-xl p-3">
+            <div className="glass-card/15 rounded-xl p-3">
               <div className="text-xl font-bold text-white">{userPoints.toLocaleString()}</div>
               <div className="text-white/80 text-xs font-medium">Total XP</div>
             </div>
-            <div className="bg-white/15 rounded-xl p-3">
+            <div className="glass-card/15 rounded-xl p-3">
               <div className="text-xl font-bold text-white">{timeAbstinent.days}</div>
               <div className="text-white/80 text-xs font-medium">Dias Limpos</div>
             </div>
@@ -588,12 +637,12 @@ export default function GamificacaoPage() {
         {/* Toast de feedback */}
         {shareMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 max-w-sm mx-auto animate-spring-in">
+            <div className="glass-card rounded-2xl shadow-2xl p-4 max-w-sm mx-auto animate-spring-in">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="text-purple-600" size={16} />
+                <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="text-purple-400" size={16} />
                 </div>
-                <p className="text-gray-800 font-medium text-sm">{shareMessage}</p>
+                <p className="text-white font-medium text-sm">{shareMessage}</p>
               </div>
             </div>
           </div>

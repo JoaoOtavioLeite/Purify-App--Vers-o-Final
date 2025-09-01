@@ -19,71 +19,17 @@ export const ADDICTION_TYPES: AddictionType[] = [
     color: "red",
     defaultReasons: [
       "A pornografia afeta negativamente meus relacionamentos e intimidade.",
-      "Quero ter mais controle sobre meus impulsos e comportamentos.",
-      "Desejo melhorar minha saúde mental e autoestima.",
+      "Quero ter mais controle sobre meus impulsos e comportamentos sexuais.",
+      "Desejo melhorar minha saúde mental, autoestima e confiança.",
       "Quero usar meu tempo de forma mais produtiva e significativa.",
+      "Desejo me reconectar com a sexualidade real e saudável.",
+      "Quero eliminar a culpa e vergonha associadas ao consumo.",
+      "Desejo melhorar minha concentração e energia mental.",
+      "Quero ser um exemplo positivo e íntegro para outros.",
+      "Desejo ter uma vida sexual mais autêntica e satisfatória.",
+      "Quero quebrar o ciclo de dependência e comportamento compulsivo.",
     ],
-  },
-  {
-    id: "smoking",
-    name: "Cigarro",
-    icon: "🚭",
-    color: "orange",
-    defaultReasons: [
-      "Quero melhorar minha saúde pulmonar e cardiovascular.",
-      "Desejo economizar dinheiro gasto com cigarros.",
-      "Quero me livrar do mau hálito e odor de cigarro.",
-      "Desejo ser um exemplo positivo para minha família.",
-    ],
-  },
-  {
-    id: "alcohol",
-    name: "Álcool",
-    icon: "🍷",
-    color: "purple",
-    defaultReasons: [
-      "Quero melhorar minha saúde física e mental.",
-      "Desejo ter mais controle sobre minhas decisões.",
-      "Quero melhorar meus relacionamentos familiares.",
-      "Desejo ter mais energia e disposição no dia a dia.",
-    ],
-  },
-  {
-    id: "drugs",
-    name: "Drogas",
-    icon: "💊",
-    color: "blue",
-    defaultReasons: [
-      "Quero recuperar minha saúde e bem-estar.",
-      "Desejo reconstruir relacionamentos importantes.",
-      "Quero ter uma vida mais estável e produtiva.",
-      "Desejo ser uma pessoa melhor para mim e outros.",
-    ],
-  },
-  {
-    id: "gambling",
-    name: "Jogos/Apostas",
-    icon: "🎰",
-    color: "green",
-    defaultReasons: [
-      "Quero ter controle financeiro e estabilidade.",
-      "Desejo reduzir o estresse e ansiedade.",
-      "Quero focar em atividades mais saudáveis.",
-      "Desejo reconstruir a confiança da minha família.",
-    ],
-  },
-  {
-    id: "social_media",
-    name: "Redes Sociais",
-    icon: "📱",
-    color: "pink",
-    defaultReasons: [
-      "Quero ter mais tempo para atividades importantes.",
-      "Desejo melhorar meu foco e produtividade.",
-      "Quero reduzir comparações e ansiedade social.",
-      "Desejo ter relacionamentos mais autênticos.",
-    ],
-  },
+  }
 ]
 
 interface MotivationEntry {
@@ -126,16 +72,17 @@ const AddictionContext = createContext<AddictionContextType | undefined>(undefin
 // Remover: currentGoal, completedGoals, progressiveGoals, completeGoal, personalizedGoals, defaultGoals
 // Manter: streakStart, lastRelapse, getTimeAbstinent, resetStreak, setAddictionType, setLastRelapseDate, motivações
 
-// Lista de marcos em horas
+// Marcos específicos para recuperação da pornografia
 export const MILESTONES = [
-  { label: '1 Dia', hours: 24, emoji: '🥇' },
-  { label: '3 Dias', hours: 72, emoji: '🥈' },
-  { label: '7 Dias', hours: 168, emoji: '🥉' },
-  { label: '15 Dias', hours: 360, emoji: '🏅' },
-  { label: '30 Dias', hours: 720, emoji: '🏆' },
-  { label: '90 Dias', hours: 2160, emoji: '🎖️' },
-  { label: '180 Dias', hours: 4320, emoji: '👑' },
-  { label: '1 Ano', hours: 8760, emoji: '🌟' },
+  { label: '24 Horas Limpo', hours: 24, emoji: '🥇', message: 'Primeiro dia vencido! O mais difícil já passou.' },
+  { label: '72 Horas Livres', hours: 72, emoji: '🧠', message: 'Seu cérebro já começou a se rebalancear.' },
+  { label: '1 Semana Pura', hours: 168, emoji: '🛡️', message: 'Primeira semana! Você quebrou o ciclo imediato.' },
+  { label: '2 Semanas Fortes', hours: 336, emoji: '💪', message: 'Dopamina se normalizando. Foco retornando!' },
+  { label: '1 Mês Livre', hours: 720, emoji: '🏆', message: 'Marco histórico! Seu cérebro está se curando.' },
+  { label: '45 Dias Limpos', hours: 1080, emoji: '🧘', message: 'Clareza mental aumentando significativamente.' },
+  { label: '90 Dias - Reboot', hours: 2160, emoji: '💎', message: 'Reboot completo! Nova versão de você mesmo.' },
+  { label: '6 Meses Transformado', hours: 4380, emoji: '🔥', message: 'Mudanças permanentes no cérebro!' },
+  { label: '1 Ano Renovado', hours: 8760, emoji: '🌟', message: 'Você é uma nova pessoa. Parabéns pela jornada!' },
 ]
 
 // Função para retornar marcos atingidos e próximos
@@ -149,7 +96,23 @@ export function getMilestones(streakStart: Date | null) {
   return { conquered, next }
 }
 
+// Função para gerar ID único do usuário
+const getUserId = (): string => {
+  if (typeof window === 'undefined') {
+    return 'temp_user_' + Math.random().toString(36).substr(2, 9)
+  }
+  
+  let userId = localStorage.getItem('purify_user_id')
+  if (!userId) {
+    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    localStorage.setItem('purify_user_id', userId)
+    console.log('🔑 Novo usuário criado:', userId)
+  }
+  return userId
+}
+
 export function AddictionProvider({ children }: { children: ReactNode }) {
+  const [userId] = useState<string>(getUserId())
   const [data, setData] = useState<AddictionData>({
     isOnboarded: false,
     addictionType: null,
@@ -230,12 +193,14 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
 
   // Carregar dados salvos na inicialização
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     const loadSavedData = () => {
       try {
-        const saved = localStorage.getItem("addictionData")
+        const saved = localStorage.getItem(`addictionData_${userId}`)
         if (saved) {
           const parsed = JSON.parse(saved)
-          console.log("✅ Dados carregados do localStorage:", parsed)
+          console.log(`✅ Dados carregados para usuário ${userId}:`, parsed)
           
           // Validar se os dados são válidos
           if (parsed && typeof parsed === 'object') {
@@ -256,23 +221,25 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
             })
           } else {
             console.log("⚠️ Dados inválidos no localStorage, usando padrão")
-            localStorage.removeItem("addictionData")
+            localStorage.removeItem(`addictionData_${userId}`)
           }
         } else {
-          console.log("ℹ️ Nenhum dado salvo encontrado, usando dados padrão")
+          console.log(`ℹ️ Nenhum dado salvo encontrado para usuário ${userId}, usando dados padrão`)
         }
       } catch (error) {
         console.error("❌ Erro ao carregar dados salvos:", error)
         // Em caso de erro, limpar localStorage e usar dados padrão
-        localStorage.removeItem("addictionData")
+        localStorage.removeItem(`addictionData_${userId}`)
       }
     }
 
     loadSavedData()
-  }, [])
+  }, [userId])
 
   // Salvar dados sempre que houver mudanças
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     if (data.isOnboarded || data.addictionType) {
       const dataToSave = {
         ...data,
@@ -281,8 +248,8 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
       }
       
       try {
-        localStorage.setItem("addictionData", JSON.stringify(dataToSave))
-        console.log("💾 Dados salvos com sucesso:", {
+        localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave))
+        console.log(`💾 Dados salvos para usuário ${userId}:`, {
           isOnboarded: dataToSave.isOnboarded,
           addictionType: dataToSave.addictionType?.name,
           lastRelapse: dataToSave.lastRelapse,
@@ -300,7 +267,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         }
       }
     }
-  }, [data])
+  }, [data, userId])
 
   const updateData = (updates: Partial<AddictionData>) => {
     setData((prev) => ({ ...prev, ...updates }))
@@ -361,7 +328,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         lastRelapse: now.toISOString(),
         streakStart: now.toISOString(),
       };
-      localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+      localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
       console.log("Streak resetado e salvo:", dataToSave);
     } catch (error) {
       console.error("Erro ao resetar streak:", error);
@@ -394,7 +361,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         lastRelapse: newData.lastRelapse?.toISOString(),
         streakStart: newData.streakStart?.toISOString(),
       };
-      localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+      localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
       console.log("Tipo de vício salvo com sucesso:", dataToSave);
     } catch (error) {
       console.error("Erro ao salvar tipo de vício:", error);
@@ -416,7 +383,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         lastRelapse: date.toISOString(),
         streakStart: date.toISOString(),
       };
-      localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+      localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
       console.log("Data de recaída salva com sucesso:", dataToSave);
     } catch (error) {
       console.error("Erro ao salvar data de recaída:", error);
@@ -440,7 +407,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         lastRelapse: newData.lastRelapse?.toISOString(),
         streakStart: newData.streakStart?.toISOString(),
       };
-      localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+      localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
       console.log("Motivação adicionada e salva:", entry);
     } catch (error) {
       console.error("Erro ao salvar motivação:", error);
@@ -461,7 +428,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         lastRelapse: newData.lastRelapse?.toISOString(),
         streakStart: newData.streakStart?.toISOString(),
       };
-      localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+      localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
       console.log("Motivação removida e salva");
     } catch (error) {
       console.error("Erro ao remover motivação:", error);
@@ -482,7 +449,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
         lastRelapse: newData.lastRelapse?.toISOString(),
         streakStart: newData.streakStart?.toISOString(),
       };
-      localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+      localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
       console.log("Motivação favoritada e salva");
     } catch (error) {
       console.error("Erro ao favoritar motivação:", error);
@@ -502,7 +469,7 @@ export function AddictionProvider({ children }: { children: ReactNode }) {
           lastRelapse: newData.lastRelapse?.toISOString(),
           streakStart: newData.streakStart?.toISOString(),
         };
-        localStorage.setItem("addictionData", JSON.stringify(dataToSave));
+        localStorage.setItem(`addictionData_${userId}`, JSON.stringify(dataToSave));
         console.log("Motivação restaurada e salva");
       } catch (error) {
         console.error("Erro ao restaurar motivação:", error);

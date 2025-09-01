@@ -30,7 +30,8 @@ import {
   Crown,
   Flame,
   Save,
-  RefreshCw
+  RefreshCw,
+  Timer
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -46,7 +47,6 @@ export default function MotivacoesPage() {
   const [isTyping, setIsTyping] = useState(false)
   const [currentQuote, setCurrentQuote] = useState(0)
   const [showSaved, setShowSaved] = useState(false)
-  const [selectedBenefits, setSelectedBenefits] = useState<number[]>([])
   const router = useRouter()
 
   const frasesInspiradoras = [
@@ -60,12 +60,7 @@ export default function MotivacoesPage() {
     "O impossível é só questão de opinião. ⚡"
   ]
 
-  const beneficios = [
-    { icon: <Heart className="text-pink-500" size={20}/>, texto: "Mais autoestima", color: "from-pink-400 to-rose-500" },
-    { icon: <Smile className="text-yellow-500" size={20}/>, texto: "Saúde mental", color: "from-yellow-400 to-orange-500" },
-    { icon: <TrendingUp className="text-green-500" size={20}/>, texto: "Produtividade", color: "from-green-400 to-emerald-500" },
-    { icon: <Lightbulb className="text-blue-500" size={20}/>, texto: "Clareza mental", color: "from-blue-400 to-indigo-500" },
-  ]
+
 
   const desafiosDoDia = [
     "Escreva 3 motivos pelos quais você quer continuar firme!",
@@ -122,13 +117,7 @@ export default function MotivacoesPage() {
     setIsTyping(e.target.value.length > 0)
   }
 
-  function toggleBenefit(index: number) {
-    setSelectedBenefits(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    )
-  }
+
 
   const streak = getTimeAbstinent().days
   const today = new Date()
@@ -140,7 +129,7 @@ export default function MotivacoesPage() {
   if (!data.addictionType) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-100 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 pb-20">
       {/* Header Inspiracional */}
       <div className="bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-700 pt-12 pb-8 px-6 rounded-b-3xl shadow-xl relative overflow-hidden">
         {/* Elementos decorativos */}
@@ -202,7 +191,7 @@ export default function MotivacoesPage() {
 
 
         {/* Card de Nova Motivação */}
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/60 relative overflow-hidden">
+        <div className="glass-card rounded-3xl p-6 shadow-xl relative overflow-hidden">
           {showConfetti && (
             <div className="absolute inset-0 pointer-events-none z-30">
               <div className="absolute animate-bounce delay-0 top-4 left-4 text-2xl">🎉</div>
@@ -217,8 +206,8 @@ export default function MotivacoesPage() {
               <Plus className="text-white" size={24} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-800">Nova Motivação</h2>
-              <p className="text-gray-600">Adicione algo que te inspire</p>
+              <h2 className="text-xl font-bold text-white">Nova Motivação</h2>
+              <p className="text-white/80">Adicione algo que te inspire</p>
             </div>
             {showSaved && (
               <div className="ml-auto flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full">
@@ -230,10 +219,10 @@ export default function MotivacoesPage() {
 
           <div className="relative mb-4">
             <textarea
-              className={`w-full rounded-2xl border-2 transition-all duration-300 p-4 text-gray-800 text-base shadow-sm bg-white/80 resize-none outline-none backdrop-blur-sm ${
+              className={`w-full rounded-2xl border-2 transition-all duration-300 p-4 text-white text-base shadow-sm bg-white/10 resize-none outline-none backdrop-blur-sm placeholder-white/60 ${
                 isTyping 
-                  ? 'border-pink-400 shadow-lg shadow-pink-200/50' 
-                  : 'border-gray-200 focus:border-pink-400'
+                  ? 'border-pink-400 shadow-lg shadow-pink-400/30' 
+                  : 'border-white/20 focus:border-pink-400'
               }`}
               rows={4}
               placeholder="O que te motiva a continuar forte hoje?"
@@ -248,7 +237,7 @@ export default function MotivacoesPage() {
               <div className={`transition-all duration-300 ${
                 newMotivation.length > 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
               }`}>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-white/50">
                   {newMotivation.length}/200
                 </span>
               </div>
@@ -261,7 +250,7 @@ export default function MotivacoesPage() {
             className={`w-full py-4 rounded-2xl font-semibold shadow-lg transition-all duration-300 flex items-center justify-center gap-2 ${
               newMotivation.trim()
                 ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:shadow-xl hover:scale-105 active:scale-95'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-white/20 text-white/50 cursor-not-allowed'
             }`}
             style={{ 
               WebkitTapHighlightColor: 'transparent',
@@ -273,81 +262,158 @@ export default function MotivacoesPage() {
           </button>
         </div>
 
-        {/* Benefícios Cards */}
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/60">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Sparkles className="text-purple-500" size={24} />
-            Benefícios da Sua Jornada
+        {/* Progresso da Jornada */}
+        <div className="glass-card rounded-3xl p-6 shadow-xl">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <TrendingUp className="text-blue-400" size={24} />
+            Progresso da Jornada
           </h2>
-          <p className="text-gray-600 text-sm mb-4">Toque nos cards para marcá-los como conquistados</p>
+          <p className="text-white/80 text-sm mb-4">Acompanhe seus marcos e conquistas</p>
+          
           <div className="grid grid-cols-2 gap-3">
-            {beneficios.map((beneficio, index) => {
-              const isSelected = selectedBenefits.includes(index)
+            {/* Tempo Limpo */}
+            <div className="bg-gradient-to-br from-blue-500/30 to-cyan-600/30 border border-blue-400/50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <Timer className="text-white" size={16} />
+                </div>
+                <span className="text-white font-medium text-sm">Tempo Limpo</span>
+              </div>
+              <div className="text-white font-bold text-lg">
+                {streak > 0 ? `${streak} dias` : `${getTimeAbstinent().hours}h ${getTimeAbstinent().minutes}m`}
+              </div>
+              <p className="text-white/70 text-xs">
+                {streak >= 7 ? '🔥 Semana completa!' : streak >= 1 ? '💪 Primeiro dia!' : '🚀 Vamos começar!'}
+              </p>
+            </div>
+
+            {/* Motivações Criadas */}
+            <div className="bg-gradient-to-br from-purple-500/30 to-pink-600/30 border border-purple-400/50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <Heart className="text-white" size={16} />
+                </div>
+                <span className="text-white font-medium text-sm">Motivações</span>
+              </div>
+              <div className="text-white font-bold text-lg">
+                {data.motivations?.length || 0}
+              </div>
+              <p className="text-white/70 text-xs">
+                {(data.motivations?.length || 0) >= 5 ? '✨ Muito inspirado!' : '📝 Continue escrevendo'}
+              </p>
+            </div>
+
+            {/* Nível de Força */}
+            <div className="bg-gradient-to-br from-orange-500/30 to-red-600/30 border border-orange-400/50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                  <Flame className="text-white" size={16} />
+                </div>
+                <span className="text-white font-medium text-sm">Nível</span>
+              </div>
+              <div className="text-white font-bold text-lg">
+                {streak >= 90 ? 'Mestre' : streak >= 30 ? 'Campeão' : streak >= 7 ? 'Guerreiro' : 'Iniciante'}
+              </div>
+              <p className="text-white/70 text-xs">
+                {streak >= 30 ? '👑 Você é incrível!' : '⬆️ Continue subindo!'}
+              </p>
+            </div>
+
+            {/* Próximo Marco */}
+            <div className="bg-gradient-to-br from-green-500/30 to-emerald-600/30 border border-green-400/50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Target className="text-white" size={16} />
+                </div>
+                <span className="text-white font-medium text-sm">Próximo Marco</span>
+              </div>
+              <div className="text-white font-bold text-lg">
+                {streak >= 365 ? '🏆 Lenda!' : 
+                 streak >= 90 ? 'Lenda (365d)' : 
+                 streak >= 30 ? 'Mestre (90d)' : 
+                 streak >= 7 ? 'Campeão (30d)' : 
+                 'Guerreiro (7d)'}
+              </div>
+              <p className="text-white/70 text-xs">
+                {streak >= 365 ? 'Você é uma lenda!' : 
+                 streak >= 90 ? `Faltam ${365 - streak} dias` :
+                 streak >= 30 ? `Faltam ${90 - streak} dias` :
+                 streak >= 7 ? `Faltam ${30 - streak} dias` :
+                 `Faltam ${7 - streak} dias`}
+              </p>
+            </div>
+          </div>
+
+          {/* Barra de progresso para próximo marco */}
+          <div className="mt-4 p-3 bg-white/10 rounded-xl">
+            {(() => {
+              // Definir níveis e seus requisitos
+              const levels = [
+                { name: 'Iniciante', days: 0, next: 'Guerreiro', nextDays: 7, color: 'from-gray-400 to-gray-500' },
+                { name: 'Guerreiro', days: 7, next: 'Campeão', nextDays: 30, color: 'from-green-400 to-emerald-500' },
+                { name: 'Campeão', days: 30, next: 'Mestre', nextDays: 90, color: 'from-blue-400 to-indigo-500' },
+                { name: 'Mestre', days: 90, next: 'Lenda', nextDays: 365, color: 'from-purple-400 to-violet-500' },
+                { name: 'Lenda', days: 365, next: null, nextDays: null, color: 'from-yellow-400 to-orange-500' }
+              ]
+              
+              // Encontrar nível atual
+              let currentLevel = levels[0]
+              for (let i = levels.length - 1; i >= 0; i--) {
+                if (streak >= levels[i].days) {
+                  currentLevel = levels[i]
+                  break
+                }
+              }
+              
+              // Calcular progresso
+              let progress = 100
+              let remainingDays = 0
+              let progressText = '100%'
+              let nextLevelText = 'Máximo!'
+              
+              if (currentLevel.next) {
+                const currentLevelDays = currentLevel.days
+                const nextLevelDays = currentLevel.nextDays!
+                const progressInLevel = streak - currentLevelDays
+                const daysNeededForNext = nextLevelDays - currentLevelDays
+                progress = Math.min((progressInLevel / daysNeededForNext) * 100, 100)
+                remainingDays = nextLevelDays - streak
+                progressText = `${Math.round(progress)}%`
+                nextLevelText = `${remainingDays} dias para ${currentLevel.next}`
+              }
+              
               return (
-                <button
-                  key={index}
-                  onClick={() => toggleBenefit(index)}
-                  className={`relative rounded-2xl p-4 shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 text-left ${
-                    isSelected 
-                      ? `bg-gradient-to-br ${beneficio.color} text-white` 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  style={{ 
-                    WebkitTapHighlightColor: 'transparent',
-                    touchAction: 'manipulation'
-                  }}
-                >
-                  {/* Checkmark para items selecionados */}
-                  {isSelected && (
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <CheckCircle className="text-white" size={14} />
-                    </div>
-                  )}
+                <>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-white/80 text-sm">
+                      {currentLevel.next ? `Progresso para ${currentLevel.next}` : 'Nível Máximo Alcançado!'}
+                    </span>
+                    <span className="text-white/60 text-xs">{progressText}</span>
+                  </div>
                   
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      isSelected ? 'bg-white/20' : 'bg-gray-200'
-                    }`}>
-                      <div className={isSelected ? 'text-white' : 'text-gray-600'}>
-                        {beneficio.icon}
-                      </div>
+                  <div className="bg-white/20 rounded-full h-3 overflow-hidden">
+                    <div 
+                      className={`bg-gradient-to-r ${currentLevel.color} h-3 rounded-full transition-all duration-1000 relative`}
+                      style={{ width: `${progress}%` }}
+                    >
+                      {progress > 0 && (
+                        <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+                      )}
                     </div>
                   </div>
-                  <p className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-gray-700'}`}>
-                    {beneficio.texto}
-                  </p>
                   
-                  {/* Indicador de status */}
-                  <div className="mt-2">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      isSelected 
-                        ? 'bg-white/20 text-white' 
-                        : 'bg-gray-200 text-gray-500'
-                    }`}>
-                      {isSelected ? '✓ Conquistado' : 'Tocar para marcar'}
+                  <div className="flex justify-between items-center mt-2 text-xs">
+                    <span className="text-white/60">
+                      Nível: {currentLevel.name} ({streak} dias)
+                    </span>
+                    <span className="text-white/60">
+                      {currentLevel.next ? nextLevelText : '🏆 Lenda Completa!'}
                     </span>
                   </div>
-                </button>
+                </>
               )
-            })}
+            })()}
           </div>
-          
-          {/* Contador de benefícios selecionados */}
-          {selectedBenefits.length > 0 && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-xl">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="text-green-600" size={20} />
-                <span className="text-green-700 font-medium">
-                  {selectedBenefits.length} de {beneficios.length} benefícios conquistados!
-                </span>
-              </div>
-              {selectedBenefits.length === beneficios.length && (
-                <p className="text-green-600 text-sm mt-1">
-                  🎉 Parabéns! Você está aproveitando todos os benefícios da sua jornada!
-                </p>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Desafio do Dia */}
@@ -371,9 +437,9 @@ export default function MotivacoesPage() {
 
         {/* Histórico de Motivações */}
         {data.motivations && data.motivations.length > 0 && (
-          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/60">
+          <div className="glass-card rounded-3xl p-6 shadow-xl ">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <BookOpen className="text-indigo-500" size={24} />
                 Minhas Motivações
               </h2>
@@ -389,7 +455,7 @@ export default function MotivacoesPage() {
                   className={`group relative bg-gradient-to-r p-4 rounded-2xl shadow-md transition-all duration-300 hover:scale-102 ${
                     m.favorite 
                       ? 'from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-yellow-200/50' 
-                      : 'from-gray-50 to-white border border-gray-200 hover:shadow-lg'
+                      : 'from-white/10 to-white/5 border border-white/20 hover:shadow-lg'
                   }`}
                 >
                   {m.favorite && (
@@ -400,8 +466,8 @@ export default function MotivacoesPage() {
                   
                   <div className="flex items-start justify-between">
                     <div className="flex-1 pr-3">
-                      <p className="text-gray-800 font-medium leading-relaxed mb-2">{m.text}</p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <p className="text-white font-medium leading-relaxed mb-2">{m.text}</p>
+                      <div className="flex items-center gap-2 text-xs text-white/60">
                         <span>{new Date(m.date).toLocaleDateString('pt-BR')}</span>
                         <span>•</span>
                         <span>{new Date(m.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -421,14 +487,14 @@ export default function MotivacoesPage() {
                         className={`p-2 rounded-lg transition-colors ${
                           m.favorite 
                             ? 'bg-yellow-100 hover:bg-yellow-200' 
-                            : 'bg-gray-100 hover:bg-gray-200'
+                            : 'bg-white/20 hover:bg-white/20'
                         }`}
                         title={m.favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
                       >
                         {m.favorite ? (
                           <Star size={14} className="text-yellow-600 fill-current" />
                         ) : (
-                          <Star size={14} className="text-gray-600" />
+                          <Star size={14} className="text-white/80" />
                         )}
                       </button>
                       <button 

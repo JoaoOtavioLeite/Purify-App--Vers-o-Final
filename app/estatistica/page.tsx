@@ -237,15 +237,15 @@ https://purify-app.vercel.app`
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50">
-      <div className="max-w-sm mx-auto p-4 pb-24 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900">
+      <div className="max-w-sm mx-auto p-4 pb-12 space-y-6">
         
         {/* Header Moderno */}
         <div className="text-center pt-6 pb-2">
-          <h1 className="text-3xl font-black bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl font-black bg-gradient-to-r from-violet-300 to-purple-300 bg-clip-text text-transparent mb-2">
             Seu Progresso
           </h1>
-          <p className="text-gray-600 text-sm">Acompanhe sua jornada de transformação</p>
+          <p className="text-white/70 text-sm">Acompanhe sua jornada de transformação</p>
         </div>
 
         {/* Card Principal - Contador Gigante */}
@@ -253,7 +253,7 @@ https://purify-app.vercel.app`
           {/* Efeito de brilho de fundo */}
           <div className={`absolute inset-0 bg-gradient-to-r ${getProgressGradient()} rounded-3xl blur-lg opacity-20 animate-pulse-soft`}></div>
           
-          <div className="relative bg-gradient-to-br from-white to-violet-50 rounded-3xl p-8 shadow-2xl border border-violet-200/50 backdrop-blur-sm">
+          <div className="relative bg-gradient-to-br from-gray-800/90 via-purple-900/90 to-violet-900/90 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
             {/* Decorações de fundo */}
             <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-violet-200/30 to-purple-200/30 rounded-full blur-xl"></div>
             <div className="absolute bottom-4 left-4 w-12 h-12 bg-gradient-to-br from-fuchsia-200/30 to-pink-200/30 rounded-full blur-lg"></div>
@@ -262,8 +262,8 @@ https://purify-app.vercel.app`
               {/* Emoji e título */}
               <div className="space-y-2">
                 <div className="text-4xl animate-bounce-tap">{getProgressEmoji()}</div>
-                <h2 className="text-lg font-bold text-violet-700 flex items-center justify-center gap-2">
-                  <Sparkles size={20} className="text-violet-500" />
+                <h2 className="text-lg font-bold text-white flex items-center justify-center gap-2">
+                  <Sparkles size={20} className="text-violet-300" />
                   Tempo de Purificação
                 </h2>
               </div>
@@ -271,31 +271,31 @@ https://purify-app.vercel.app`
               {/* Contador principal */}
               <div className="space-y-4">
                 <div className="flex items-baseline justify-center gap-3">
-                  <span className="text-7xl font-black bg-gradient-to-br from-violet-600 to-purple-600 bg-clip-text text-transparent drop-shadow-lg animate-rubber-band">
+                  <span className="text-7xl font-black bg-gradient-to-br from-violet-300 to-purple-300 bg-clip-text text-transparent drop-shadow-lg animate-rubber-band">
                     {timeAbstinent.days > 0 ? timeAbstinent.days : timeAbstinent.hours > 0 ? timeAbstinent.hours : timeAbstinent.minutes}
                   </span>
                   <div className="text-left">
-                    <div className="text-2xl font-bold text-violet-500">
+                    <div className="text-2xl font-bold text-white">
                       {timeAbstinent.days > 0
                         ? timeAbstinent.days === 1 ? "dia" : "dias"
                         : timeAbstinent.hours > 0
                           ? timeAbstinent.hours === 1 ? "hora" : "horas"
                           : timeAbstinent.minutes === 1 ? "minuto" : "minutos"}
                     </div>
-                    <div className="text-sm text-gray-500 font-medium">de superação</div>
+                    <div className="text-sm text-white/70 font-medium">de superação</div>
                   </div>
                 </div>
 
                 {/* Tempo detalhado */}
-                <div ref={progressCardRef} className="bg-violet-100/70 backdrop-blur-sm rounded-2xl p-4 border border-violet-200/50">
-                  <div className="text-violet-700 font-mono text-xl font-bold tracking-wider">
+                <div ref={progressCardRef} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                  <div className="text-white font-mono text-xl font-bold tracking-wider">
                     {String(timeAbstinent.days).padStart(2, '0')}d {String(timeAbstinent.hours).padStart(2, '0')}h {String(timeAbstinent.minutes).padStart(2, '0')}m {String(timeAbstinent.seconds).padStart(2, '0')}s
                   </div>
-                  <div className="text-violet-600 text-sm mt-1 font-medium">Tempo real • Cada momento conta</div>
+                  <div className="text-white/70 text-sm mt-1 font-medium">Tempo real • Cada momento conta</div>
                 </div>
 
                 {/* Data de início */}
-                <div className="flex items-center justify-center gap-2 text-gray-600">
+                <div className="flex items-center justify-center gap-2 text-white/60">
                   <Calendar size={16} />
                   <span className="text-sm font-medium">Desde {data.streakStart ? new Date(data.streakStart).toLocaleDateString('pt-BR', { 
                     day: '2-digit', 
@@ -347,20 +347,20 @@ https://purify-app.vercel.app`
 
         {/* Estatísticas Rápidas */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100 text-center animate-spring-in">
-            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <Trophy className="text-green-600" size={20} />
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center animate-spring-in">
+            <div className="w-10 h-10 bg-green-500/30 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <Trophy className="text-green-300" size={20} />
             </div>
-            <div className="text-2xl font-bold text-gray-800">{conquered.length}</div>
-            <div className="text-sm text-gray-600">Marcos Conquistados</div>
+            <div className="text-2xl font-bold text-white">{conquered.length}</div>
+            <div className="text-sm text-white/70">Marcos Conquistados</div>
           </div>
           
-          <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100 text-center animate-spring-in" style={{ animationDelay: '0.1s' }}>
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-              <Star className="text-blue-600" size={20} />
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center animate-spring-in" style={{ animationDelay: '0.1s' }}>
+            <div className="w-10 h-10 bg-blue-500/30 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <Star className="text-blue-300" size={20} />
             </div>
-            <div className="text-2xl font-bold text-gray-800">{Math.floor(timeAbstinent.days / 7) + 1}</div>
-            <div className="text-sm text-gray-600">Nível Atual</div>
+            <div className="text-2xl font-bold text-white">{Math.floor(timeAbstinent.days / 7) + 1}</div>
+            <div className="text-sm text-white/70">Nível Atual</div>
           </div>
         </div>
 
@@ -419,15 +419,15 @@ https://purify-app.vercel.app`
         {showConfirmReset && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
-            <div className="relative bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-spring-in">
+            <div className="relative bg-gray-800/95 backdrop-blur-xl border border-white/20 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-spring-in">
               <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                  <RotateCcw className="text-red-600" size={24} />
+                <div className="w-16 h-16 bg-red-500/30 rounded-full flex items-center justify-center mx-auto">
+                  <RotateCcw className="text-red-300" size={24} />
                 </div>
                 
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Reiniciar Contagem?</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
+                  <h3 className="text-xl font-bold text-white mb-2">Reiniciar Contagem?</h3>
+                  <p className="text-white/70 text-sm leading-relaxed">
                     Tem certeza que deseja reiniciar sua contagem? Todo o progresso atual será perdido, mas você pode começar uma nova jornada imediatamente.
                   </p>
                 </div>
@@ -435,7 +435,7 @@ https://purify-app.vercel.app`
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowConfirmReset(false)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-xl transition-all native-button-press"
+                    className="flex-1 bg-white/20 hover:bg-white/30 text-white font-medium py-3 px-4 rounded-xl transition-all native-button-press"
                   >
                     Cancelar
                   </button>
@@ -454,20 +454,20 @@ https://purify-app.vercel.app`
         {/* Marcos Conquistados */}
         {conquered.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <Crown className="text-yellow-500" size={24} />
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Crown className="text-yellow-400" size={24} />
               Marcos Conquistados
             </h3>
             
             <div className="space-y-3">
               {conquered.slice(-3).reverse().map((milestone, index) => (
-                <div key={milestone.hours} className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100 flex items-center gap-4 animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Trophy className="text-yellow-600" size={20} />
+                <div key={milestone.hours} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 flex items-center gap-4 animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div className="w-12 h-12 bg-yellow-500/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Trophy className="text-yellow-300" size={20} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-800">{milestone.label}</h4>
-                    <p className="text-sm text-gray-600">{Math.floor(milestone.hours / 24)} dias • Marco conquistado!</p>
+                    <h4 className="font-bold text-white">{milestone.label}</h4>
+                    <p className="text-sm text-white/70">{Math.floor(milestone.hours / 24)} dias • Marco conquistado!</p>
                   </div>
                   <div className="text-2xl">{milestone.emoji}</div>
                 </div>
@@ -481,12 +481,12 @@ https://purify-app.vercel.app`
       {/* Toast de feedback para compartilhamento */}
       {shareMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 max-w-sm mx-auto animate-spring-in">
+          <div className="bg-gray-800/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-4 max-w-sm mx-auto animate-spring-in">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="text-green-600" size={16} />
+              <div className="w-8 h-8 bg-green-500/30 rounded-full flex items-center justify-center">
+                <CheckCircle className="text-green-300" size={16} />
               </div>
-              <p className="text-gray-800 font-medium text-sm">{shareMessage}</p>
+              <p className="text-white font-medium text-sm">{shareMessage}</p>
             </div>
           </div>
         </div>
